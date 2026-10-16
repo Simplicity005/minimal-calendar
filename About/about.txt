@@ -1,0 +1,7 @@
+Title: Align Shared Calendar
+Domain: Software
+Tags: Next.js, Supabase, Calendar, SaaS
+Year: 2024
+
+About:
+Align is a multi-tenant shared calendar app built for teams, cohorts, and study groups to coordinate schedules efficiently. It includes secure room-based collaboration, event categorization, and automated invites for shared planning.
