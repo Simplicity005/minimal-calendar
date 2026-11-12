@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { Room } from "../../types/calendar";
 import styles from "./invite-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -51,7 +52,8 @@ export function InviteDialog({ isOpen, onClose, activeRoom, rooms }: Props) {
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const currentRoom = activeRoom || rooms[0];
 
@@ -141,9 +143,9 @@ export function InviteDialog({ isOpen, onClose, activeRoom, rooms }: Props) {
 
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={onClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={onClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="invite-dialog-title"

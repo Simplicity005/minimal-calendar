@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Trash2, KeyRound, ChevronRight } from "lucide-react";
 import { ChangePasswordDialog } from "../change-password-dialog/change-password-dialog";
 import styles from "./account-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -24,13 +25,14 @@ export function AccountDialog({
 }: Props) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   return (
     <>
-      <div className={styles.backdrop} role="presentation" onClick={onClose}>
+      <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={onClose}>
         <div
-          className={styles.dialog}
+          className={styles.dialog} data-closing={closing ? "true" : undefined}
           role="dialog"
           aria-modal="true"
           aria-labelledby="account-dialog-title"

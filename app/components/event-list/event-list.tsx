@@ -24,6 +24,12 @@ export function EventList({
   onEventClick,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  const handleDelete = (id: string) => {
+    setRemovingId(id);
+    setTimeout(() => { onDeleteEvent(id); setRemovingId(null); }, 280);
+  };
 
   // Reset expansion when date changes
   useEffect(() => {
@@ -62,7 +68,7 @@ export function EventList({
               return (
                 <div 
                   key={ev.id} 
-                  className={styles.agendaRow}
+                  className={`${styles.agendaRow} ${removingId === ev.id ? styles.removing : ""}`}
                   onClick={() => onEventClick(ev)}
                   style={{ cursor: "pointer" }}
                 >
@@ -75,7 +81,7 @@ export function EventList({
                   </div>
                   <button 
                     className={styles.deleteBtn} 
-                    onClick={(e) => { e.stopPropagation(); onDeleteEvent(ev.id); }}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(ev.id); }}
                     title="Delete event"
                     aria-label="Delete event"
                   >

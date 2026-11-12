@@ -175,18 +175,17 @@ function LoginContent() {
               <MailCheck size={48} color="var(--gold)" />
               <h2
                 style={{
-                  fontFamily: "'Pilcrow Rounded', sans-serif",
+                  fontFamily: "'Big Shoulders Display', sans-serif",
                   fontSize: "20px",
                   color: "var(--ink)",
                   fontWeight: 500,
-                  fontStyle: "italic",
-                }}
+                  }}
               >
                 Check your email
               </h2>
               <p
                 style={{
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "14px",
                   color: "var(--ink-dim)",
                   lineHeight: 1.5,
@@ -229,12 +228,11 @@ function LoginContent() {
               />
               <h2
                 style={{
-                  fontFamily: "'Pilcrow Rounded', sans-serif",
+                  fontFamily: "'Big Shoulders Display', sans-serif",
                   fontSize: "24px",
                   color: "var(--ink)",
                   fontWeight: 500,
-                  fontStyle: "italic",
-                }}
+                  }}
               >
                 Welcome, {welcomeName}!
               </h2>
@@ -272,11 +270,10 @@ function LoginContent() {
               />
               <h2
                 style={{
-                  fontFamily: "'Pilcrow Rounded', sans-serif",
+                  fontFamily: "'Big Shoulders Display', sans-serif",
                   fontSize: "24px",
                   color: "var(--ink)",
                   fontWeight: 500,
-                  fontStyle: "italic",
                   margin: 0,
                 }}
               >
@@ -284,7 +281,7 @@ function LoginContent() {
               </h2>
               <p
                 style={{
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "13.5px",
                   color: "var(--ink-dim)",
                   lineHeight: 1.5,

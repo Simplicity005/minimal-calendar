@@ -128,11 +128,10 @@ function ResetPasswordContent() {
               <CheckCircle2 size={48} color="var(--gold)" />
               <h2
                 style={{
-                  fontFamily: "'Pilcrow Rounded', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "22px",
                   color: "var(--ink)",
                   fontWeight: 500,
-                  fontStyle: "italic",
                   margin: 0,
                 }}
               >
@@ -140,7 +139,7 @@ function ResetPasswordContent() {
               </h2>
               <p
                 style={{
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "13.5px",
                   color: "var(--ink-dim)",
                   lineHeight: 1.5,
@@ -163,7 +162,7 @@ function ResetPasswordContent() {
                   border: "2px solid var(--rule)",
                   background: "var(--gold)",
                   color: "var(--bg)",
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "13px",
                   fontWeight: 600,
                   textDecoration: "none",
@@ -181,11 +180,10 @@ function ResetPasswordContent() {
                 <KeyRound size={20} color="var(--gold)" />
                 <h2
                   style={{
-                    fontFamily: "'Pilcrow Rounded', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "20px",
                     color: "var(--ink)",
                     fontWeight: 500,
-                    fontStyle: "italic",
                     margin: 0,
                   }}
                 >
@@ -194,7 +192,7 @@ function ResetPasswordContent() {
               </div>
               <p
                 style={{
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "13px",
                   color: "var(--ink-dim)",
                   margin: "0 0 4px 0",
@@ -212,7 +210,7 @@ function ResetPasswordContent() {
                     background: "rgba(255, 68, 68, 0.12)",
                     color: "#ff4d4d",
                     border: "1px solid rgba(255, 68, 68, 0.3)",
-                    fontFamily: "'Archivo', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "12.5px",
                   }}
                 >
@@ -224,7 +222,7 @@ function ResetPasswordContent() {
                 <label
                   htmlFor="new-password"
                   style={{
-                    fontFamily: "'Archivo', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "11px",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -249,7 +247,7 @@ function ResetPasswordContent() {
                     borderRadius: "12px",
                     background: "var(--surface-raised)",
                     color: "var(--ink)",
-                    fontFamily: "'Archivo', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "14px",
                     boxShadow: "2px 2px 0px 0px var(--shadow)",
                   }}
@@ -260,7 +258,7 @@ function ResetPasswordContent() {
                 <label
                   htmlFor="confirm-password"
                   style={{
-                    fontFamily: "'Archivo', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "11px",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -285,7 +283,7 @@ function ResetPasswordContent() {
                     borderRadius: "12px",
                     background: "var(--surface-raised)",
                     color: "var(--ink)",
-                    fontFamily: "'Archivo', sans-serif",
+                    fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: "14px",
                     boxShadow: "2px 2px 0px 0px var(--shadow)",
                   }}
@@ -303,7 +301,7 @@ function ResetPasswordContent() {
                   border: "2px solid var(--rule)",
                   background: "var(--gold)",
                   color: "var(--bg)",
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "13.5px",
                   fontWeight: 600,
                   cursor: loading ? "not-allowed" : "pointer",
@@ -330,7 +328,7 @@ function ResetPasswordContent() {
                   textAlign: "center",
                   marginTop: "4px",
                   color: "var(--ink-dim)",
-                  fontFamily: "'Archivo', sans-serif",
+                  fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "12px",
                   textDecoration: "none",
                 }}

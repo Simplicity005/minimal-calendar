@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
 import type { Room } from "../../types/calendar";
 import styles from "./room-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -30,7 +31,14 @@ export function RoomDialog({
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setMode(rooms.length > 0 ? "rooms" : "create");
+    }
+  }, [isOpen, rooms.length]);
+
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,9 +125,9 @@ export function RoomDialog({
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={onClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={onClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="room-dialog-title"

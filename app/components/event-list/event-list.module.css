@@ -8,15 +8,16 @@
 }
 
 .panelHead h2 {
-  font-family: "Pilcrow Rounded", sans-serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 20px;
-  color: var(--gold);
+  font-family: "Big Shoulders Display", sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
 }
 
 .dateArrow {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   color: var(--ink-faint);
   text-transform: uppercase;
@@ -31,9 +32,14 @@
 .agendaRow {
   display: flex;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 2px solid var(--rule);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
   position: relative;
+  transition: transform 0.2s var(--ease-soft);
+}
+
+.agendaRow:hover {
+  transform: translateX(2px);
 }
 
 .agendaRow:last-child {
@@ -42,7 +48,7 @@
 }
 
 .agendaTime {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10.5px;
   color: var(--ink-faint);
   width: 56px;
@@ -55,22 +61,23 @@
 }
 
 .title {
-  font-family: 'Archivo', sans-serif;
-  font-size: 15px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--ink);
   margin-bottom: 4px;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .agendaRow:hover .title {
-  font-weight: 700;
+  color: var(--gold);
 }
 
 .meta {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -99,7 +106,7 @@
   color: var(--ink-faint);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.2s;
 }
 
 .agendaRow:hover .deleteBtn {
@@ -113,7 +120,7 @@
 .emptyState {
   padding: 32px 0;
   text-align: center;
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   color: var(--ink-dim);
 }
@@ -128,7 +135,7 @@
   background: transparent;
   border: none;
   color: var(--gold);
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -136,13 +143,12 @@
   margin-top: 8px;
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
   width: 100%;
 }
 
 .viewMoreBtn:hover {
   color: var(--ink);
-  font-weight: 700;
 }
 
 .viewMoreContent {
@@ -162,4 +168,37 @@
   height: 4px;
   border-radius: 50%;
   background-color: currentColor;
+}
+
+.agendaRow {
+  animation: rise-in 0.45s var(--ease-soft) backwards;
+  overflow: hidden;
+}
+
+.agendaRow:nth-child(1) { animation-delay: 40ms; }
+.agendaRow:nth-child(2) { animation-delay: 100ms; }
+.agendaRow:nth-child(3) { animation-delay: 160ms; }
+.agendaRow:nth-child(4) { animation-delay: 220ms; }
+.agendaRow:nth-child(n + 5) { animation-delay: 280ms; }
+
+.removing {
+  max-height: 120px;
+  animation: row-out 0.28s var(--ease-soft) forwards !important;
+  pointer-events: none;
+}
+
+.emptyState {
+  animation: rise-in 0.5s var(--ease-soft) backwards;
+}
+
+.viewMoreBtn .dot {
+  animation: dot-bounce 1.4s ease-in-out infinite;
+}
+
+.viewMoreBtn .dot:nth-child(2) { animation-delay: 0.15s; }
+.viewMoreBtn .dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dot-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-3px); }
 }

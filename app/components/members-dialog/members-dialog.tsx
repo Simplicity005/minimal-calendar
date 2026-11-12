@@ -5,6 +5,7 @@ import { Users, UserPlus, Shield, User, ShieldAlert } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import type { Room } from "../../types/calendar";
 import styles from "./members-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type MemberInfo = {
   id: string;
@@ -36,8 +37,11 @@ export function MembersDialog({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (activeRoom) {
+    const sharedRooms = rooms.filter((r) => r.name !== "Personal Calendar");
+    if (activeRoom && activeRoom.name !== "Personal Calendar") {
       setSelectedRoomId(activeRoom.id);
+    } else if (sharedRooms.length > 0) {
+      setSelectedRoomId(sharedRooms[0].id);
     } else if (rooms.length > 0) {
       setSelectedRoomId(rooms[0].id);
     }
@@ -88,7 +92,8 @@ export function MembersDialog({
     };
   }, [isOpen, selectedRoomId]);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const currentRoom = rooms.find((r) => r.id === selectedRoomId) || activeRoom || rooms[0];
 
@@ -104,9 +109,9 @@ export function MembersDialog({
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={onClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={onClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="members-dialog-title"

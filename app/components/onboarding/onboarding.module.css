@@ -10,24 +10,26 @@
 
 .panel {
   background: var(--surface);
-  border: 2px solid var(--rule);
-  border-radius: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   padding: 40px;
   width: 100%;
   max-width: 480px;
   text-align: center;
+  box-shadow: var(--depth-2);
 }
 
 .title {
-  font-family: "Pilcrow Rounded", sans-serif;
-  font-size: 2rem;
-  font-weight: 500;
+  font-family: "Big Shoulders Display", sans-serif;
+  text-transform: uppercase;
+  font-size: 2.15rem;
+  font-weight: 700;
   color: var(--gold);
   margin-bottom: 12px;
 }
 
 .subtitle {
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 14px;
   color: var(--ink-dim);
   margin-bottom: 32px;
@@ -45,7 +47,7 @@
   flex-direction: column;
   gap: 8px;
   color: var(--ink-faint);
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -55,14 +57,14 @@
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  border: 2px solid var(--rule);
-  border-radius: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   background: var(--surface-raised);
   font-weight: 500;
   color: var(--ink);
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 15px;
-  transition: all 0.15s ease;
+  transition: all 0.28s var(--ease-soft);
 }
 
 .field input:focus {
@@ -75,13 +77,13 @@
   height: 48px;
   background: var(--gold);
   color: var(--bg);
-  border: 2px solid var(--rule);
-  border-radius: 8px;
-  font-family: "Archivo", sans-serif;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.28s var(--ease-soft);
 }
 
 .submitButton:hover:not(:disabled) {
@@ -97,7 +99,7 @@
 
 .error {
   color: var(--exam-dim);
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 12px;
   margin-top: 8px;
   text-align: center;

@@ -1,282 +1,275 @@
-.panelHead {
+.calendarSection {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ── Poster header ───────────────────────────────────────────── */
+.poster {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
-.monthNavGroup {
+.posterLeft {
   display: flex;
-  align-items: center;
-  max-width: 300px;
-  min-width: 230px;
-  justify-content: space-between;
+  align-items: flex-end;
+  gap: 14px;
+  min-width: 0;
 }
 
-.arrowBtn {
-  background: none;
-  border: 1px solid var(--rule);
-  color: var(--ink-dim);
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
+.posterRight {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  box-shadow: 1px 1px 0px 0px var(--shadow);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
 }
 
-.arrowBtn:hover {
-  background: var(--gold);
+.monthPickerWrapper {
+  position: relative;
+}
+
+.monthHeading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 3.8rem;
+  line-height: 0.82;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
   color: var(--ink);
-  transform: translate(1px, 1px);
-  box-shadow: 0px 0px 0px 0px transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.25s var(--ease-soft);
 }
 
-.nav {
+.monthHeading:hover,
+.monthHeadingOpen {
+  color: var(--ink-dim);
+}
+
+.indexBadge {
+  align-self: flex-start;
+  margin-top: 4px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ink-dim);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.yearStack {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  padding-bottom: 2px;
+}
+
+/* Mini next-month preview */
+.miniCal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.miniIndex {
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 22px);
+  row-gap: 4px;
+  text-align: center;
+  font-size: 9px;
+  color: var(--ink-dim);
+}
+
+.miniWeekday {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.miniDayHidden {
+  visibility: hidden;
+}
+
+.navRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Archivo', sans-serif;
-  font-size: 11px;
-  color: var(--ink-faint);
 }
 
-.nav button {
-  background: var(--surface);
-  border: 2px solid var(--rule);
-  color: var(--ink);
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  font-size: 12px;
-  cursor: pointer;
+.navArrow {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  color: var(--ink-dim);
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.1s;
-  box-shadow: 2px 2px 0px 0px var(--shadow);
+  transition: color 0.2s ease, transform 0.25s var(--ease-soft);
 }
 
-.nav button:hover {
-  background: var(--gold);
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px transparent;
+.navArrow:hover {
+  color: var(--ink);
+}
+
+.navArrow:last-of-type:hover {
+  transform: translateX(3px);
+}
+
+.navArrow:first-of-type:hover {
+  transform: translateX(-3px);
 }
 
 .addBtn {
-  font-family: 'Archivo', sans-serif;
-  padding: 10px 15px;
-  font-size: 11px !important;
-  letter-spacing: 0.04em;
-  color: #1a1a1a !important;
-  background: var(--gold) !important;
-  border: 2px solid var(--rule) !important;
-  border-radius: 12px !important;
-  cursor: pointer;
-  width: auto !important;
-  height: auto !important;
-  box-shadow: 1px 1px 0px 0px var(--shadow);
-  transition: all 0.1s;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .addBtn:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 0px 0px 0px 0px transparent;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
 }
 
+/* ── Weekdays + grid ─────────────────────────────────────────── */
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  border: 1px solid var(--rule);
+  margin-bottom: 0;
 }
 
 .weekdays span {
-  font-family: 'Archivo', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink);
   text-align: center;
-  padding-bottom: 8px;
+  padding: 6px 0;
 }
 
 .grid {
+  --row-h: 46px;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 54px;
-  animation: calendar-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes calendar-in {
-  from {
-    opacity: 0;
-    transform: translateX(5px);
+  grid-template-rows: repeat(var(--rows), var(--row-h));
+  margin-top: -1px;
   }
 
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.sundayPill {
+  position: absolute;
+  left: calc(100% * 6 / 7 + 8px);
+  width: calc(100% / 7 - 16px);
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0.9;
+  box-shadow: 0 6px 16px rgba(196, 95, 71, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: top;
+  animation: pill-in 0.7s var(--ease-soft) 0.1s both;
 }
 
 .cell {
-  border-top: 2px solid var(--rule);
-  border-right: 2px solid var(--rule);
-  padding: 7px 8px;
   position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
+  z-index: 1;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
+  animation: cell-in 0.45s var(--ease-soft) backwards;
+  animation-delay: calc(var(--i, 0) * 9ms);
 }
 
-.cell:nth-child(7n) {
-  border-right: none;
+.dayCell {
+  border: 1px solid var(--rule);
+  margin: 0 -1px -1px 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.cell:hover:not(.empty) {
-  background: rgba(203, 184, 158, 0.05);
+.dayCell:hover {
+  background: rgba(207, 200, 188, 0.05);
 }
 
-.cell:hover:not(.empty) .date {
-  font-weight: 800;
-  color: var(--ink);
+.dayCell.selected {
+  background: rgba(207, 200, 188, 0.05);
 }
 
-.cell.selected:not(.today) {
-  background: rgba(203, 184, 158, 0.1);
-}
-
-.date {
-  font-family: 'Pilcrow Rounded', sans-serif;
-  font-size: 14px;
-  color: var(--ink-dim);
-  transition: all 0.15s ease;
-}
-
-.empty {
-  background: repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(203, 184, 158, 0.02) 6px, rgba(203, 184, 158, 0.02) 7px);
+.overflow {
   cursor: default;
 }
 
-.today {
-  background: var(--surface-raised);
+.overflow .date {
+  color: var(--ink-faint);
+}
+
+.date {
+  position: relative;
+  z-index: 2;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+  transition: transform 0.25s var(--ease-soft), color 0.2s ease;
 }
 
 .today .date {
-  color: var(--gold);
-  font-weight: 500;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #F3E9DD;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--surface);
+  animation: pop 0.5s var(--ease-soft) both;
 }
 
-.fold {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 16px 16px 0;
-  border-color: transparent var(--bg) transparent transparent;
-  filter: drop-shadow(-1px 1px 1px rgba(0, 0, 0, 0.5));
+@keyframes pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-.tabs {
+.eventDots {
   margin-top: auto;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.tab {
-  font-family: 'Pilcrow Rounded', sans-serif;
-  font-size: 8.5px;
-  letter-spacing: 0.03em;
-  padding: 1.5px 5px;
-  border-radius: 8px;
-  line-height: 1.5;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tabExam {
-  background: var(--exam-dim);
-  color: var(--exam);
-  border: 1px solid var(--rule);
-}
-
-.tabQuiz {
-  background: var(--quiz-dim);
-  color: var(--quiz);
-  border: 1px solid var(--rule);
-}
-
-.tabStudy {
-  background: var(--study-dim);
-  color: var(--study);
-  border: 1px solid var(--rule);
-}
-
-.tabGeneral {
-  background: var(--surface-raised);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-}
-
-.additionalDots {
-  display: flex;
-  gap: 3px;
-  margin-top: 2px;
-  padding: 0 2px;
-}
-
-.smallDot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-
-.smallDotExam {
-  background: var(--exam-dim);
-}
-
-.smallDotQuiz {
-  background: var(--quiz-dim);
-}
-
-.smallDotStudy {
-  background: var(--study-dim);
-}
-
-.smallDotGeneral {
-  background: var(--ink-dim);
-}
-
-.legend {
-  display: flex;
-  gap: 18px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--rule-soft);
-  font-family: 'Archivo', sans-serif;
-  font-size: 10.5px;
-  color: var(--ink-dim);
-}
-
-.legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  display: inline-block;
 }
 
 .dotExam {
@@ -291,55 +284,44 @@
   background: var(--study-dim);
 }
 
-/* Month picker */
-.monthPickerWrapper {
-  position: relative;
+.dotGeneral {
+  background: var(--ink-dim);
 }
 
-.monthHeading {
-  font-family: 'Pilcrow Rounded', sans-serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 21px;
-  padding: 0px 12px;
-  color: var(--ink);
-  cursor: pointer;
-  text-decoration: none;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
-  transition: font-weight 0.3s ease, text-decoration-color 0.2s, color 0.2s;
-  text-decoration-color: transparent;
+.legend {
   display: flex;
-  user-select: none;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
 }
 
-.monthHeadingHover {
-  font-weight: 900;
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.monthHeadingOpen {
-  color: var(--gold, #cbb89e);
-  font-weight: 900;
-}
-
+/* ── Month / year picker ─────────────────────────────────────── */
 .monthDropdown {
   position: absolute;
-  right: -40px;
-  top: 50;
-  background: var(--surface-raised, #1a1a1a);
-  border: 2px solid var(--rule);
-  border-radius: 16px;
-  padding: 8px;
+  left: 0;
+  top: calc(100% + 12px);
+  background: var(--surface-raised);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  width: 222px;
+  width: 232px;
   z-index: 30;
-  box-shadow: 4px 4px 0px 0px var(--shadow);
-  animation: dropdown-in 0.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  animation: dropdown-in 0.18s var(--ease-soft) both;
 }
 
-/* Year header row */
 .yearHeader {
   display: flex;
   justify-content: center;
@@ -347,32 +329,21 @@
 }
 
 .yearBtn {
-  font-family: 'Pilcrow Rounded', sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--ink-dim);
   background: none;
   border: none;
-  cursor: pointer;
   padding: 2px 8px;
-  border-radius: 8px;
-  transition: font-weight 0.25s ease, color 0.2s;
-  letter-spacing: 0.04em;
-  width: auto !important;
-  height: auto !important;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  transition: color 0.2s ease;
 }
 
-.yearBtnHover {
-  font-weight: 700;
+.yearBtn:hover {
   color: var(--ink);
 }
 
-.yearBtnOpen {
-  font-weight: 700;
-  color: var(--gold);
-}
-
-/* Year-view header: back arrow + centred year title */
 .yearViewHeader {
   display: flex;
   align-items: center;
@@ -381,42 +352,33 @@
 }
 
 .backBtn {
-  background: var(--surface);
-  border: 2px solid var(--rule);
+  background: transparent;
+  border: 1px solid var(--rule);
   color: var(--ink);
   width: 24px;
   height: 24px;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 14px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.1s;
+  transition: background 0.2s ease;
   flex-shrink: 0;
-  width: 24px !important;
-  height: 24px !important;
-  box-shadow: 2px 2px 0px 0px var(--shadow);
 }
 
 .backBtn:hover {
-  background: var(--surface-raised);
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px transparent;
+  background: var(--rule-soft);
 }
 
 .yearViewTitle {
-  font-family: 'Pilcrow Rounded', sans-serif;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.06em;
   text-align: center;
   flex: 1;
 }
 
-
-/* Drum-wheel container */
 .yearWheelOuter {
   position: relative;
   height: 180px;
@@ -424,7 +386,6 @@
   margin-bottom: 6px;
 }
 
-/* Center-rail: two horizontal lines framing the selected item */
 .yearRail {
   position: absolute;
   inset: 0;
@@ -450,7 +411,6 @@
   top: calc(50% + 18px);
 }
 
-/* Gradient mask fades items above and below center */
 .yearWheel {
   height: 100%;
   overflow-y: scroll;
@@ -460,30 +420,16 @@
   overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.45) 20%,
-      black 36%,
-      black 64%,
-      rgba(0, 0, 0, 0.45) 80%,
-      transparent 100%);
-  mask-image: linear-gradient(to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.45) 20%,
-      black 36%,
-      black 64%,
-      rgba(0, 0, 0, 0.45) 80%,
-      transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 20%, black 36%, black 64%, rgba(0, 0, 0, 0.45) 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 20%, black 36%, black 64%, rgba(0, 0, 0, 0.45) 80%, transparent 100%);
 }
 
 .yearWheel::-webkit-scrollbar {
   display: none;
 }
 
-/* Top & bottom spacers let the first/last year scroll to center */
 .yearSpacer {
   height: 72px;
-  /* 2 * ITEM_HEIGHT — keeps first/last items reachable */
   flex-shrink: 0;
 }
 
@@ -493,14 +439,11 @@
   align-items: center;
   justify-content: center;
   scroll-snap-align: center;
-  font-family: 'Pilcrow Rounded', sans-serif;
   font-size: 15px;
-  font-weight: 400;
   color: var(--ink-faint);
   cursor: pointer;
-  transition: font-weight 0.2s ease, color 0.2s;
+  transition: color 0.2s ease;
   user-select: none;
-  border-radius: 8px;
 }
 
 .yearItem:hover {
@@ -508,8 +451,8 @@
 }
 
 .yearItemActive {
-  font-weight: 700;
-  color: var(--gold);
+  font-weight: 600;
+  color: var(--ink);
   font-size: 16px;
 }
 
@@ -519,7 +462,6 @@
   margin: 4px 0 8px;
 }
 
-/* 3-column month grid inside the dropdown */
 .monthGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -539,78 +481,164 @@
 }
 
 .monthOption {
-  font-family: 'Archivo', sans-serif;
-  font-size: 10.5px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink);
-  background: var(--surface);
-  border: 2px solid transparent;
-  border-radius: 8px;
-  padding: 6px 4px;
-  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 4px;
   text-align: center;
   width: 100%;
-  height: auto !important;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  letter-spacing: 0.01em;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .monthOption:hover {
-  background: rgba(203, 184, 158, 0.08);
+  background: var(--rule-soft);
   border-color: var(--rule);
-  color: var(--ink);
 }
 
 .monthOptionActive {
-  background: var(--gold);
-  border-color: var(--rule);
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: 2px 2px 0px 0px var(--rule);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #F3E9DD;
 }
 
-.dateRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+.monthOptionActive:hover {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
-.eventsIndicator {
-  display: flex;
-  gap: 3px;
-  align-items: center;
+/* ── Mobile ──────────────────────────────────────────────────── */
+
+.dayCell:hover {
+  background: rgba(207, 200, 188, 0.06);
+  box-shadow: inset 0 0 0 1px var(--ink-faint);
 }
 
-.desktopDot {
-  display: inline-block;
+.dayCell:hover .date {
+  transform: translateY(-2px) scale(1.12);
 }
 
-.mobileDot {
-  display: none;
+.dayCell:active {
+  transform: scale(0.97);
 }
 
-.desktopTabs {
-  display: flex;
-}
-
-.dotGeneral {
+.dayCell.selected::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 6px;
+  height: 1px;
   background: var(--ink-dim);
+  transform-origin: left;
+  animation: underline-in 0.35s var(--ease-soft) both;
 }
 
-@media (max-width: 768px) {
-  .desktopDot {
-    display: none;
-  }
+.dot {
+  animation: pop 0.45s var(--ease-soft) both;
+}
 
-  .mobileDot {
-    display: inline-block;
-  }
+@keyframes cell-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .desktopTabs {
-    display: none !important;
-  }
+@keyframes pill-in {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 0.88; }
+}
 
-  .monthDropdown {
-    right: 0;
-  }
+@keyframes underline-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.slideNext { --shift: 14px; }
+.slidePrev { --shift: -14px; }
+
+.slideNext .cell,
+.slidePrev .cell {
+  animation-name: cell-slide;
+}
+
+@keyframes cell-slide {
+  from { opacity: 0; transform: translateX(var(--shift)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.addBtn:active,
+.navArrow:active {
+  transform: scale(0.94);
+}
+
+/* Responsive: container-based so it adapts to the panel width, not the screen */
+@container (max-width: 640px) {
+  .miniCal { display: none; }
+  .monthHeading { font-size: 3.2rem; }
+}
+
+@container (max-width: 420px) {
+  .monthHeading { font-size: 2.8rem; }
+  .indexBadge { width: 26px; height: 26px; font-size: 10.5px; }
+  .yearStack { font-size: 13px; }
+  .navRow { gap: 4px; }
+  .navArrow svg { width: 22px; }
+  .addBtn { padding: 6px 8px; font-size: 9.5px; letter-spacing: 0.06em; }
+  .poster { gap: 8px; }
+  .cell { padding: 5px 5px; }
+  .date { font-size: 12.5px; }
+  .today .date { width: 24px; height: 24px; margin: -4px 0 0 -4px; }
+  .legend { gap: 12px; }
+}
+.monthGrid,
+.yearWheelOuter,
+.yearHeader,
+.yearViewHeader {
+  animation: rise-in 0.3s var(--ease-soft) backwards;
+}
+
+.monthOption {
+  animation: rise-in 0.35s var(--ease-soft) backwards;
+}
+
+.monthOption:nth-child(3n + 2) { animation-delay: 25ms; }
+.monthOption:nth-child(3n) { animation-delay: 50ms; }
+
+.monthHeading {
+  transition: color 0.25s var(--ease-soft), transform 0.35s var(--ease-soft), letter-spacing 0.35s var(--ease-soft);
+}
+
+.monthHeading:hover {
+  transform: translateX(3px);
+  letter-spacing: 0.02em;
+}
+
+.legend span {
+  animation: rise-in 0.5s var(--ease-soft) backwards;
+}
+
+.legend span:nth-child(2) { animation-delay: 80ms; }
+.legend span:nth-child(3) { animation-delay: 160ms; }
+
+.indexBadge,
+.yearStack,
+.miniCal {
+  animation: rise-in 0.6s var(--ease-soft) backwards;
+}
+
+.indexBadge { animation-delay: 80ms; }
+.yearStack { animation-delay: 140ms; }
+.miniCal { animation-delay: 200ms; }
+
+.indexBadge {
+  transition: transform 0.4s var(--ease-soft), background 0.3s ease, color 0.3s ease;
+}
+
+.indexBadge:hover {
+  transform: rotate(90deg);
+  background: var(--ink);
+  color: var(--bg);
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isToday, setMonth, setYear, getYear } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isToday, setMonth, setYear, getYear, subDays, addDays } from "date-fns";
 import { supabase } from "../../../lib/supabase";
 import type { Room, CalendarEvent } from "../../types/calendar";
 import styles from "./calendar-panel.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   selectedDate: Date | undefined;
@@ -21,20 +22,48 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
 const ITEM_HEIGHT = 36; // px — height of each year row in the drum wheel
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 21 }, (_, i) => THIS_YEAR - 10 + i);
+
+/** Monday-first weekday index (Mon = 0 … Sun = 6) */
+const mondayIndex = (d: Date) => (getDay(d) + 6) % 7;
+
+type Cell = { type: "overflow" | "day"; key: string; date: Date };
+
+function buildCells(month: Date): Cell[] {
+  const start = startOfMonth(month);
+  const end = endOfMonth(month);
+  const lead = mondayIndex(start);
+  const days = eachDayOfInterval({ start, end });
+  const total = Math.ceil((lead + days.length) / 7) * 7;
+  const trail = total - lead - days.length;
+
+  const cells: Cell[] = [];
+  for (let i = lead; i > 0; i--) {
+    const d = subDays(start, i);
+    cells.push({ type: "overflow", key: `prev-${format(d, "yyyy-MM-dd")}`, date: d });
+  }
+  days.forEach((d) => cells.push({ type: "day", key: format(d, "yyyy-MM-dd"), date: d }));
+  for (let i = 1; i <= trail; i++) {
+    const d = addDays(end, i);
+    cells.push({ type: "overflow", key: `next-${format(d, "yyyy-MM-dd")}`, date: d });
+  }
+  return cells;
+}
 
 export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRoom, rooms, refreshTrigger }: Props) {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDate || new Date()));
   const [monthEvents, setMonthEvents] = useState<CalendarEvent[]>([]);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
-  const [hoverUnderline, setHoverUnderline] = useState(false);
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
-  const [yearHover, setYearHover] = useState(false);
+  const monthMenu = usePresence(monthPickerOpen, 180);
   const monthPickerRef = useRef<HTMLDivElement>(null);
   const yearScrollRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [dir, setDir] = useState<'next' | 'prev'>('next');
 
   // Scroll wheel to the correct year whenever it opens
   useEffect(() => {
@@ -45,8 +74,7 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     }
   }, [yearPickerOpen, currentMonth]);
 
-  // Live-update year as the wheel scrolls — debounced so re-renders
-  // don't interrupt the scroll animation mid-flight
+  // Live-update year as the wheel scrolls — debounced
   const handleYearScroll = useCallback(() => {
     if (!yearScrollRef.current) return;
     const scrollTop = yearScrollRef.current.scrollTop;
@@ -63,7 +91,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     }, 80);
   }, []);
 
-  // Clicking a year item snaps the wheel to it
   const scrollToYear = (idx: number) => {
     yearScrollRef.current?.scrollTo({ top: idx * ITEM_HEIGHT, behavior: "smooth" });
   };
@@ -74,6 +101,7 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     const handleClick = (e: MouseEvent) => {
       if (monthPickerRef.current && !monthPickerRef.current.contains(e.target as Node)) {
         setMonthPickerOpen(false);
+        setYearPickerOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -81,12 +109,10 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
   }, [monthPickerOpen]);
 
   const handleSelectMonth = (monthIndex: number) => {
+    setDir(monthIndex >= currentMonth.getMonth() ? 'next' : 'prev');
     setCurrentMonth(startOfMonth(setMonth(currentMonth, monthIndex)));
     setMonthPickerOpen(false);
   };
-
-  const handleHeadingMouseEnter = () => setHoverUnderline(true);
-  const handleHeadingMouseLeave = () => setHoverUnderline(false);
 
   // Fetch events for the current month
   const fetchMonthEvents = useCallback(async () => {
@@ -111,45 +137,24 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     fetchMonthEvents();
   }, [fetchMonthEvents, refreshTrigger]);
 
-  // Generate calendar grid (42 cells: 6 weeks * 7 days)
-  const gridCells = useMemo(() => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
-    const daysInMonth = eachDayOfInterval({ start, end });
-    const startWeekday = getDay(start); // 0 = Sunday, 1 = Monday...
+  const gridCells = useMemo(() => buildCells(currentMonth), [currentMonth]);
+  const rowCount = gridCells.length / 7;
 
-    type Cell = { type: "empty" | "day"; key: string; date?: Date };
-    const cells: Cell[] = [];
-
-    // Empty cells before the 1st
-    for (let i = 0; i < startWeekday; i++) {
-      cells.push({ type: "empty", key: `prev-empty-${i}` });
-    }
-
-    // Actual days
-    daysInMonth.forEach((day) => {
-      cells.push({ type: "day", date: day, key: format(day, "yyyy-MM-dd") });
+  // Rows whose Sunday belongs to this month → continuous vertical capsule
+  const sundayRange = useMemo(() => {
+    const rows: number[] = [];
+    gridCells.forEach((c, i) => {
+      if (i % 7 === 6 && c.type === "day") rows.push(Math.floor(i / 7));
     });
+    if (rows.length === 0) return null;
+    return { first: rows[0], last: rows[rows.length - 1] };
+  }, [gridCells]);
 
-    // Empty cells after the end to complete 42 cells (6 rows)
-    const remaining = 42 - cells.length;
-    for (let i = 0; i < remaining; i++) {
-      cells.push({ type: "empty", key: `next-empty-${i}` });
-    }
+  const nextMonth = addMonths(currentMonth, 1);
+  const miniCells = useMemo(() => buildCells(nextMonth), [nextMonth]);
 
-    return cells;
-  }, [currentMonth]);
-
-  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-
-  const getTabClass = (type: string) => {
-    const t = type.toLowerCase();
-    if (t === "exam") return styles.tabExam;
-    if (t === "quiz") return styles.tabQuiz;
-    if (t === "study") return styles.tabStudy;
-    return styles.tabGeneral;
-  };
+  const handlePrevMonth = () => { setDir('prev'); setCurrentMonth(subMonths(currentMonth, 1)); };
+  const handleNextMonth = () => { setDir('next'); setCurrentMonth(addMonths(currentMonth, 1)); };
 
   const getDotClass = (type: string) => {
     const t = type.toLowerCase();
@@ -159,30 +164,28 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     return styles.dotGeneral;
   };
 
+  const yearStr = format(currentMonth, "yyyy");
+
   return (
     <div className={styles.calendarSection}>
-      <div className={styles.panelHead}>
-        <div className={styles.monthNavGroup}>
-          <button className={styles.arrowBtn} onClick={handlePrevMonth} aria-label="Previous month">‹</button>
+      <div className={styles.poster}>
+        <div className={styles.posterLeft}>
           <div className={styles.monthPickerWrapper} ref={monthPickerRef}>
             <h2
-              className={`${styles.monthHeading} ${hoverUnderline ? styles.monthHeadingHover : ""} ${monthPickerOpen ? styles.monthHeadingOpen : ""}`}
+              className={`${styles.monthHeading} ${monthPickerOpen ? styles.monthHeadingOpen : ""}`}
               onClick={() => setMonthPickerOpen((o) => !o)}
-              onMouseEnter={handleHeadingMouseEnter}
-              onMouseLeave={handleHeadingMouseLeave}
               aria-haspopup="listbox"
               aria-expanded={monthPickerOpen}
+              aria-label={`${format(currentMonth, "MMMM yyyy")} — choose month`}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === "Enter" && setMonthPickerOpen((o) => !o)}
             >
-              {format(currentMonth, "MMMM yyyy")}
+              {format(currentMonth, "MMM")}
             </h2>
-            {monthPickerOpen && (
-              <div className={styles.monthDropdown} role="dialog" aria-label="Select month and year">
-
+            {monthMenu.mounted && (
+              <div className={styles.monthDropdown} role="dialog" aria-label="Select month and year" data-closing={monthMenu.closing ? "true" : undefined}>
                 {yearPickerOpen ? (
-                  /* ══ YEAR VIEW ══ */
                   <>
                     <div className={styles.yearViewHeader}>
                       <button
@@ -193,7 +196,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
                         ‹
                       </button>
                       <span className={styles.yearViewTitle}>{getYear(currentMonth)}</span>
-                      {/* spacer to balance the back button and keep title centered */}
                       <div style={{ width: 24 }} />
                     </div>
 
@@ -222,14 +224,11 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
                     </div>
                   </>
                 ) : (
-                  /* ══ MONTH VIEW ══ */
                   <>
                     <div className={styles.yearHeader}>
                       <button
-                        className={`${styles.yearBtn} ${yearHover ? styles.yearBtnHover : ""}`}
+                        className={styles.yearBtn}
                         onClick={() => setYearPickerOpen(true)}
-                        onMouseEnter={() => setYearHover(true)}
-                        onMouseLeave={() => setYearHover(false)}
                         aria-label="Pick a year"
                       >
                         {getYear(currentMonth)}
@@ -247,74 +246,112 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
                           className={`${styles.monthOption} ${i === currentMonth.getMonth() ? styles.monthOptionActive : ""}`}
                           onClick={() => handleSelectMonth(i)}
                         >
-                          {name}
+                          {name.slice(0, 3)}
                         </button>
                       ))}
                     </div>
                   </>
                 )}
-
               </div>
             )}
           </div>
-          <button className={styles.arrowBtn} onClick={handleNextMonth} aria-label="Next month">›</button>
+
+          <div className={styles.indexBadge} aria-hidden="true">
+            {format(currentMonth, "MM")}
+          </div>
+
+          <div className={styles.yearStack} aria-hidden="true">
+            <span>{yearStr.slice(0, 2)}</span>
+            <span>{yearStr.slice(2)}</span>
+          </div>
         </div>
 
-        <div className={styles.nav}>
-          <button className={styles.addBtn} onClick={onAddEvent}>+ Add event</button>
+        <div className={styles.posterRight}>
+          <div className={styles.miniCal} aria-hidden="true">
+            <div className={styles.miniIndex}>{format(nextMonth, "MM")}</div>
+            <div className={styles.miniGrid}>
+              {WEEKDAYS.map((w) => (
+                <span key={w} className={styles.miniWeekday}>{w}</span>
+              ))}
+              {miniCells.map((c) => (
+                <span
+                  key={c.key}
+                  className={`${styles.miniDay} ${c.type === "overflow" ? styles.miniDayHidden : ""}`}
+                >
+                  {c.type === "day" ? format(c.date, "d") : ""}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.navRow}>
+            <button className={styles.navArrow} onClick={handlePrevMonth} aria-label="Previous month">
+              <svg width="28" height="10" viewBox="0 0 28 10" fill="none" aria-hidden="true">
+                <path d="M27 5H1M1 5l4-4M1 5l4 4" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            </button>
+            <button className={styles.navArrow} onClick={handleNextMonth} aria-label="Next month">
+              <svg width="28" height="10" viewBox="0 0 28 10" fill="none" aria-hidden="true">
+                <path d="M1 5h26M27 5l-4-4M27 5l-4 4" stroke="currentColor" strokeWidth="1" />
+              </svg>
+            </button>
+            <button className={styles.addBtn} onClick={onAddEvent}>+ Add event</button>
+          </div>
         </div>
       </div>
 
       <div className={styles.weekdays}>
-        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        {WEEKDAYS.map((w) => <span key={w}>{w}</span>)}
       </div>
 
-      <div className={styles.grid} key={currentMonth.toString()}>
-        {gridCells.map((cell) => {
-          if (cell.type === "empty") {
-            return <div key={cell.key} className={`${styles.cell} ${styles.empty}`}></div>;
+      <div
+        className={`${styles.grid} ${dir === "next" ? styles.slideNext : styles.slidePrev}`}
+        key={currentMonth.toString()}
+        style={{ ["--rows" as string]: rowCount }}
+      >
+        {sundayRange && (
+          <div
+            className={styles.sundayPill}
+            aria-hidden="true"
+            style={{
+              top: `calc(${(sundayRange.first / rowCount) * 100}% + 4px)`,
+              height: `calc(${((sundayRange.last - sundayRange.first + 1) / rowCount) * 100}% - 8px)`,
+            }}
+          />
+        )}
+
+        {gridCells.map((cell, idx) => {
+          if (cell.type === "overflow") {
+            return (
+              <div key={cell.key} className={`${styles.cell} ${styles.overflow}`} style={{ ["--i" as string]: idx }}>
+                <span className={styles.date}>{format(cell.date, "d")}</span>
+              </div>
+            );
           }
 
-          const dateStr = format(cell.date!, "yyyy-MM-dd");
+          const dateStr = format(cell.date, "yyyy-MM-dd");
           const dayEvents = monthEvents.filter(e => e.event_date === dateStr);
-          const isSelected = selectedDate && isSameDay(cell.date!, selectedDate);
-          const isTodayDate = isToday(cell.date!);
+          const isSelected = selectedDate && isSameDay(cell.date, selectedDate);
+          const isTodayDate = isToday(cell.date);
 
           return (
             <div
               key={cell.key}
-              className={`${styles.cell} ${isSelected ? styles.selected : ''} ${isTodayDate ? styles.today : ''}`}
-              onClick={() => onSelectDate(cell.date!)}
+              className={`${styles.cell} ${styles.dayCell} ${isSelected ? styles.selected : ""} ${isTodayDate ? styles.today : ""}`}
+              style={{ ["--i" as string]: idx }}
+              onClick={() => onSelectDate(cell.date)}
+              title={dayEvents.map(e => e.title).join(" · ") || undefined}
             >
-              {isTodayDate && <div className={styles.fold}></div>}
-              <div className={styles.dateRow}>
-                <span className={styles.date}>{format(cell.date!, "d")}</span>
-
-                {dayEvents.length > 0 && (
-                  <div className={styles.eventsIndicator}>
-                    {dayEvents.slice(1).map(ev => (
-                      <div
-                        key={`desk-${ev.id}`}
-                        className={`${styles.dot} ${getDotClass(ev.event_type)} ${styles.desktopDot}`}
-                        title={ev.title}
-                      ></div>
-                    ))}
-                    {dayEvents.slice(0, 2).map(ev => (
-                      <div
-                        key={`mob-${ev.id}`}
-                        className={`${styles.dot} ${getDotClass(ev.event_type)} ${styles.mobileDot}`}
-                        title={ev.title}
-                      ></div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <span className={styles.date}>{format(cell.date, "d")}</span>
 
               {dayEvents.length > 0 && (
-                <div className={`${styles.tabs} ${styles.desktopTabs}`}>
-                  <div className={`${styles.tab} ${getTabClass(dayEvents[0].event_type)}`} title={dayEvents[0].title}>
-                    {dayEvents[0].event_type}
-                  </div>
+                <div className={styles.eventDots}>
+                  {dayEvents.slice(0, 3).map(ev => (
+                    <span
+                      key={ev.id}
+                      className={`${styles.dot} ${getDotClass(ev.event_type)}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>

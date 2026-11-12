@@ -21,6 +21,7 @@ import styles from "./page.module.css";
 import { supabase } from "../lib/supabase";
 import type { CalendarEvent, EventType, Room } from "./types/calendar";
 import { useNotifications } from "./hooks/useNotifications";
+import { usePresence } from "./hooks/usePresence";
 
 export default function Home() {
   const router = useRouter();
@@ -40,6 +41,10 @@ export default function Home() {
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUpcomingExpanded, setIsUpcomingExpanded] = useState(false);
+  const roomMenu = usePresence(isDropdownOpen, 180);
+  const [swap, setSwap] = useState(0);
+  const activeRoomId = activeRoom?.id;
+  useEffect(() => { setSwap((s) => s + 1); }, [activeRoomId]);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -151,10 +156,15 @@ export default function Home() {
 
       setRooms(formattedRooms);
 
-      // Select Personal Calendar by default if no active room is set
-      if (formattedRooms.length > 0 && !activeRoom) {
-        const personal = formattedRooms.find(r => r.name === "Personal Calendar");
-        setActiveRoom(personal || formattedRooms[0]);
+      // Select Personal Calendar by default if no active room is set or if active room was removed
+      if (formattedRooms.length > 0) {
+        setActiveRoom((prev) => {
+          if (prev && formattedRooms.some((r) => r.id === prev.id)) {
+            return prev;
+          }
+          const personal = formattedRooms.find(r => r.name === "Personal Calendar");
+          return personal || formattedRooms[0];
+        });
       }
     }
   };
@@ -346,14 +356,14 @@ export default function Home() {
                 className={styles.roomSelectWrapper}
                 onClick={(e) => { e.stopPropagation(); setIsDropdownOpen(!isDropdownOpen); }}
               >
-                <h1>{activeRoom ? activeRoom.name : "Loading..."}</h1>
+                <h1 key={activeRoom?.id ?? "loading"} className={styles.roomTitle}>{activeRoom ? activeRoom.name : "Loading..."}</h1>
                 <ChevronDown
                   size={20}
                   className={`${styles.dropdownIcon} ${isDropdownOpen ? styles.dropdownIconOpen : ""}`}
                 />
 
-                {isDropdownOpen && (
-                  <div className={styles.roomDropdown}>
+                {roomMenu.mounted && (
+                  <div className={styles.roomDropdown} data-closing={roomMenu.closing ? "true" : undefined}>
                     {rooms.find(r => r.name === "Personal Calendar") && (
                       <button
                         className={`${styles.roomOption} ${activeRoom?.name === "Personal Calendar" ? styles.roomOptionActive : ""}`}
@@ -394,16 +404,16 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className={styles.headerActions}>
-            {activeRoom?.name !== "Personal Calendar" && (
+          {activeRoom && activeRoom.name !== "Personal Calendar" && (
+            <div className={styles.headerActions}>
               <button className={styles.inviteBtn} onClick={() => setIsInviteModalOpen(true)}>
                 <UserPlus size={14} /> Invite
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className={styles.layout}>
+        <div className={`${styles.layout} ${swap % 2 ? styles.swapA : styles.swapB}`}>
           {/* Left panel: calendar */}
           <div className={`${styles.panel} animate-in`} style={{ animationDelay: "200ms" }}>
             <CalendarPanel

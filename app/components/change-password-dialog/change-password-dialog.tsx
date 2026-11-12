@@ -4,6 +4,7 @@ import { useState } from "react";
 import { KeyRound, ShieldCheck, Loader2 } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import styles from "./change-password-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -22,7 +23,8 @@ export function ChangePasswordDialog({ isOpen, onClose, userEmail }: Props) {
     type: "error" | "success";
   } | null>(null);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const handleClose = () => {
     if (loading) return;
@@ -152,9 +154,9 @@ export function ChangePasswordDialog({ isOpen, onClose, userEmail }: Props) {
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={handleClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={handleClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="change-password-title"

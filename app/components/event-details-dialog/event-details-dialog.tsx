@@ -1,9 +1,11 @@
 "use client";
 
+import { useRef } from "react";
 import { format } from "date-fns";
 import { X, Calendar as CalendarIcon, Clock, AlignLeft, User } from "lucide-react";
 import type { CalendarEvent, Room } from "../../types/calendar";
 import styles from "./event-details-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   event: CalendarEvent | null;
@@ -13,8 +15,14 @@ type Props = {
   currentUserId: string | null;
 };
 
-export function EventDetailsDialog({ event, rooms, isOpen, onClose, currentUserId }: Props) {
-  if (!isOpen || !event) return null;
+export function EventDetailsDialog({ event: eventProp, rooms, isOpen, onClose, currentUserId }: Props) {
+  // Remember the last event so the content stays visible during the exit animation
+  const lastEvent = useRef<CalendarEvent | null>(eventProp);
+  if (eventProp) lastEvent.current = eventProp;
+  const event = eventProp ?? lastEvent.current;
+
+  const { mounted, closing } = usePresence(isOpen && !!eventProp);
+  if (!mounted || !event) return null;
 
   const eventRoom = rooms.find((r) => r.id === event.calendar_id);
   const roomName = eventRoom ? eventRoom.name : "Unknown Calendar";
@@ -43,9 +51,9 @@ export function EventDetailsDialog({ event, rooms, isOpen, onClose, currentUserI
   }
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={onClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={onClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-details-title"

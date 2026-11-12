@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LogOut, Loader2 } from "lucide-react";
 import styles from "./sign-out-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -13,7 +14,8 @@ type Props = {
 export function SignOutDialog({ isOpen, onClose, onConfirmSignOut }: Props) {
   const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const handleConfirm = async () => {
     try {
@@ -26,9 +28,9 @@ export function SignOutDialog({ isOpen, onClose, onConfirmSignOut }: Props) {
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={loading ? undefined : onClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={loading ? undefined : onClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="sign-out-title"

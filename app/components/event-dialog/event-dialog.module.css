@@ -10,24 +10,27 @@
   background: rgba(12, 12, 12, 0.85);
   /* matches --bg with opacity */
   animation: fade-in 180ms var(--ease-soft) both;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .dialog {
   width: min(100%, 31rem);
   padding: clamp(1.4rem, 4vw, 2.25rem);
-  border: 2px solid var(--rule);
-  border-radius: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   background: var(--surface);
-  box-shadow: 2px 2px 0px 0px var(--shadow);
+  box-shadow: var(--depth-3);
   animation: dialog-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .title {
-  margin: 0 0 1.6rem;
+  margin: 0 0 1.4rem;
   color: var(--ink);
-  font-family: 'Pilcrow Rounded', sans-serif;
-  font-size: 35px;
-  font-weight: 500;
+  font-family: 'Big Shoulders Display', sans-serif;
+  text-transform: uppercase;
+  font-size: 30px;
+  font-weight: 700;
 }
 
 .form {
@@ -45,7 +48,7 @@
   display: grid;
   gap: 0.42rem;
   color: var(--ink-faint);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -57,14 +60,14 @@
   width: 100%;
   min-height: 2.75rem;
   padding: 0.65rem 0.75rem;
-  border: 2px solid var(--rule);
-  border-radius: 12px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   background: var(--surface-raised);
   color: var(--ink);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
-  transition: all 0.1s;
-  box-shadow: 2px 2px 0px 0px var(--shadow);
+  transition: all 0.28s var(--ease-soft);
+  box-shadow: var(--depth-1);
 }
 
 .field textarea {
@@ -94,17 +97,17 @@
 .saveButton {
   min-height: 2.65rem;
   padding: 0.55rem 1.2rem;
-  border-radius: 12px;
-  font-family: 'Archivo', sans-serif;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition: all 0.28s var(--ease-soft);
   cursor: pointer;
-  box-shadow: 2px 2px 0px 0px var(--rule);
+  box-shadow: var(--depth-1);
 }
 
 .cancelButton {
-  border: 2px solid var(--rule);
+  border: 1px solid var(--rule);
   background: var(--surface);
   color: var(--ink);
 }
@@ -112,31 +115,31 @@
 .cancelButton:hover {
   background: var(--surface-raised);
   color: var(--ink);
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--rule);
+  transform: translateY(-1px);
+  box-shadow: var(--depth-2);
 
 }
 
 .cancelButton:active {
-  box-shadow: 0px 0px 0px 0px var(--rule);
-  transform: translate(2px, 2px);
+  box-shadow: none;
+  transform: translateY(1px) scale(0.985);
 }
 
 .saveButton {
-  border: 2px solid var(--rule);
+  border: 1px solid var(--rule);
   background: var(--gold);
   color: var(--bg);
 }
 
 .saveButton:hover {
   opacity: 1;
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--rule);
+  transform: translateY(-1px);
+  box-shadow: var(--depth-2);
 }
 
 .saveButton:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--rule);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: none;
 }
 
 @keyframes fade-in {
@@ -166,3 +169,14 @@
     grid-template-columns: 1fr;
   }
 }
+.header,
+.body,
+.actions,
+.form,
+.accountContainer {
+  animation: rise-in 0.5s var(--ease-soft) backwards;
+}
+
+.header { animation-delay: 60ms; }
+.body, .form, .accountContainer { animation-delay: 110ms; }
+.actions { animation-delay: 160ms; }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import styles from "./delete-account-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -21,7 +22,8 @@ export function DeleteAccountDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
 
   const isConfirmed = confirmationInput.trim() === "DELETE";
 
@@ -48,9 +50,9 @@ export function DeleteAccountDialog({
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onClick={handleClose}>
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation" onClick={handleClose}>
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-account-title"

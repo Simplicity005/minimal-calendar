@@ -22,35 +22,40 @@
 /* ── Colour Tokens ───────────────────────────────────────────────────── */
 :root {
   /* Backgrounds */
-  --bg: #171717;
-  --bg-warm: #171717;
-  --surface: #242424;
-  --surface-raised: #2E2E2E;
+  --bg: #1E2024;
+  --bg-warm: #1E2024;
+  --surface: #26282C;
+  --surface-raised: #2C2F35;
 
-  /* Ink */
-  --ink: #F0EBE1;
-  --ink-dim: #A3A3A3;
-  --ink-faint: #737373;
+  /* Ink (soft parchment, low contrast) */
+  --ink: #CFC8BC;
+  --ink-dim: #8E8A82;
+  --ink-faint: #55575D;
 
   /* Rules / borders */
-  --rule: #454545;
-  --rule-soft: #333333;
+  --rule: #3E4147;
+  --rule-soft: #32353A;
 
-  /* Event types (Muted Pastels for dark mode) */
-  --exam: #171717;
-  --exam-dim: #D69494; /* Soft clay/pink */
+  /* Event types (muted risograph) */
+  --exam: #1E2024;
+  --exam-dim: #D0725E;
+  --quiz: #1E2024;
+  --quiz-dim: #7B98B8;
+  --study: #1E2024;
+  --study-dim: #C2A86B;
 
-  --quiz: #171717;
-  --quiz-dim: #94ADD6; /* Soft blue */
+  /* Accents */
+  --gold: #CFC8BC;
+  --accent: #C45F47;
 
-  --study: #171717;
-  --study-dim: #C7C08F; /* Soft sage/sand */
+  --shadow: transparent;
 
-  /* Accent */
-  --gold: #B8AC95; /* Muted taupe */
-  
-  /* Soft Neobrutalism Shadows */
-  --shadow: rgba(0, 0, 0, 0.35);
+  /* Depth */
+  --depth-1: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.18);
+  --depth-2: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 24px rgba(0, 0, 0, 0.28);
+  --depth-3: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 8px rgba(0, 0, 0, 0.35), 0 24px 56px rgba(0, 0, 0, 0.5);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: "Big Shoulders Display", sans-serif;
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -74,7 +79,7 @@ body {
   overflow-x: hidden;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Archivo", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -88,7 +93,7 @@ body::after {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
   pointer-events: none;
   z-index: 9999;
@@ -147,6 +152,19 @@ body {
   animation: slideFadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes slideFadeIn {
   from {
     opacity: 0;
@@ -156,4 +174,102 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOTION SYSTEM — enter / exit / micro-interactions
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Exit animations (driven by data-closing from usePresence) ───────── */
+[data-closing="true"] {
+  pointer-events: none !important;
+}
+
+[data-closing="true"][role="presentation"] {
+  animation: backdrop-out 220ms var(--ease-soft) forwards !important;
+}
+
+[data-closing="true"][role="dialog"] {
+  animation: dialog-out 220ms var(--ease-soft) forwards !important;
+}
+
+[data-closing="true"]:not([role]) {
+  animation: dropdown-out 170ms var(--ease-soft) forwards !important;
+}
+
+@keyframes backdrop-out {
+  from { opacity: 1; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  to { opacity: 0; -webkit-backdrop-filter: blur(0px); backdrop-filter: blur(0px); }
+}
+
+@keyframes dialog-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(10px) scale(0.975); }
+}
+
+@keyframes dropdown-out {
+  from { opacity: 1; transform: translateY(0) scaleY(1); }
+  to { opacity: 0; transform: translateY(-6px) scaleY(0.95); }
+}
+
+@media (max-width: 768px) {
+  [data-closing="true"]:not([role]) {
+    animation-name: dropdown-out-centered !important;
+  }
+}
+
+@keyframes dropdown-out-centered {
+  from { opacity: 1; transform: translateX(-50%) translateY(0) scaleY(1); }
+  to { opacity: 0; transform: translateX(-50%) translateY(-6px) scaleY(0.95); }
+}
+
+/* Dialog backdrops fade + blur in */
+[role="presentation"] {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* ── Micro-interactions ──────────────────────────────────────────────── */
+button,
+a,
+input,
+select,
+textarea {
+  transition-property: background-color, color, border-color, box-shadow, transform, opacity;
+  transition-duration: 0.25s;
+  transition-timing-function: var(--ease-soft);
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ink-dim);
+  box-shadow: 0 0 0 3px rgba(207, 200, 188, 0.08);
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+svg {
+  transition: transform 0.3s var(--ease-soft), color 0.25s ease;
+}
+
+button:not(:disabled):hover > svg {
+  transform: scale(1.1);
+}
+
+/* Soft page / content entrance */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes row-out {
+  to { opacity: 0; transform: translateX(14px); max-height: 0; padding-top: 0; padding-bottom: 0; }
 }

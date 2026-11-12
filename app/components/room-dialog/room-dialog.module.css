@@ -9,15 +9,17 @@
   padding: 1rem;
   background: rgba(12, 12, 12, 0.85);
   animation: fade-in 180ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .dialog {
   width: min(100%, 31rem);
   padding: clamp(1.4rem, 4vw, 2.25rem);
-  border: 2px solid var(--rule);
-  border-radius: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   background: var(--surface);
-  box-shadow: 4px 4px 0px 0px var(--shadow);
+  box-shadow: var(--depth-3);
   animation: dialog-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -28,16 +30,16 @@
 .title {
   margin: 0;
   color: var(--ink);
-  font-family: 'Archivo', sans-serif;
-  font-style: italic;
-  font-size: 26px;
-  font-weight: 500;
+  font-family: 'Big Shoulders Display', sans-serif;
+  text-transform: uppercase;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .subtitle {
   margin: 0.4rem 0 0;
   color: var(--ink-dim);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
 }
 
@@ -54,7 +56,7 @@
   border: 0;
   background: transparent;
   color: var(--ink-faint);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -91,7 +93,7 @@
   display: grid;
   gap: 0.42rem;
   color: var(--ink-faint);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -101,14 +103,14 @@
   width: 100%;
   min-height: 2.75rem;
   padding: 0.65rem 0.75rem;
-  border: 2px solid var(--rule);
-  border-radius: 12px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   background: var(--surface-raised);
   color: var(--ink);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
   transition: all 0.1s;
-  box-shadow: 2px 2px 0px 0px var(--shadow);
+  box-shadow: var(--depth-1);
 }
 
 .field input:hover,
@@ -116,8 +118,8 @@
   background: var(--surface-raised);
   border-color: var(--rule);
   outline: none;
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px transparent;
+  transform: translateY(-1px);
+  box-shadow: none;
 }
 
 .roomsListContainer {
@@ -149,14 +151,14 @@
 }
 
 .roomRowName {
-  font-family: 'Pilcrow Rounded', sans-serif;
+  font-family: 'Big Shoulders Display', sans-serif;
   font-size: 14px;
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .roomRowRole {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -171,19 +173,19 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 4px;
-  border: 1px solid rgba(226, 135, 139, 0.3);
+  border: 1px solid rgba(214, 148, 148, 0.35);
   background: transparent;
-  color: var(--exam, #E2878B);
-  font-family: 'Archivo', sans-serif;
+  color: var(--exam-dim);
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.28s var(--ease-soft);
 }
 
 .leaveRoomRowBtn:hover {
-  background: rgba(226, 135, 139, 0.15);
-  border-color: var(--exam, #E2878B);
+  background: rgba(214, 148, 148, 0.15);
+  border-color: var(--exam-dim);
 }
 
 .deleteRoomRowBtn {
@@ -200,7 +202,7 @@
   text-align: center;
   padding: 1.5rem 0;
   color: var(--ink-dim);
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
 }
 
@@ -210,11 +212,11 @@
   background: var(--gold);
   color: var(--bg);
   border-radius: 6px;
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.28s var(--ease-soft);
   margin-left: auto;
 }
 
@@ -232,7 +234,7 @@
   display: grid;
   gap: 0.75rem;
   padding: 1rem 1.15rem;
-  border-radius: 12px;
+  border-radius: 6px;
   background: var(--bg);
   border: 1px solid var(--rule-soft);
 }
@@ -244,7 +246,7 @@
 }
 
 .accountLabel {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -252,10 +254,10 @@
 }
 
 .accountVal {
-  font-family: 'Pilcrow Rounded', sans-serif;
-  font-size: 13.5px;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: 14px;
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .dangerZone {
@@ -263,13 +265,13 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem 1.15rem;
-  border-radius: 12px;
+  border-radius: 6px;
   background: rgba(255, 68, 68, 0.05);
   border: 1px dashed rgba(255, 68, 68, 0.3);
 }
 
 .dangerZoneTitle {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -278,7 +280,7 @@
 }
 
 .dangerZoneDesc {
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   color: var(--ink-dim);
   line-height: 1.4;
@@ -291,15 +293,15 @@
   justify-content: center;
   gap: 6px;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid rgba(255, 68, 68, 0.4);
   background: rgba(255, 68, 68, 0.1);
   color: #ff4d4d;
-  font-family: 'Archivo', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.28s var(--ease-soft);
   width: fit-content;
 }
 
@@ -307,7 +309,7 @@
   background: #ff4d4d;
   color: #fff;
   border-color: #ff4d4d;
-  box-shadow: 2px 2px 0px 0px rgba(255, 68, 68, 0.3);
+  box-shadow: var(--depth-2);
 }
 
 .actions {
@@ -321,17 +323,17 @@
 .saveButton {
   min-height: 2.65rem;
   padding: 0.55rem 1.2rem;
-  border-radius: 12px;
-  font-family: 'Archivo', sans-serif;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition: all 0.28s var(--ease-soft);
   cursor: pointer;
-  box-shadow: 2px 2px 0px 0px var(--rule);
+  box-shadow: var(--depth-1);
 }
 
 .cancelButton {
-  border: 2px solid var(--rule);
+  border: 1px solid var(--rule);
   background: var(--surface);
   color: var(--ink);
 }
@@ -339,40 +341,38 @@
 .cancelButton:hover {
   background: var(--surface-raised);
   color: var(--ink);
-  font-weight: 700;
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px 0px var(--rule);
+  transform: translateY(-1px);
+  box-shadow: var(--depth-2);
 }
 
 .cancelButton:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--rule);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: none;
 }
 
 .saveButton {
-  border: 2px solid var(--rule);
+  border: 1px solid var(--rule);
   background: var(--gold);
   color: var(--bg);
 }
 
 .saveButton:hover {
   opacity: 1;
-  font-weight: 700;
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px 0px var(--rule);
+  transform: translateY(-1px);
+  box-shadow: var(--depth-2);
 }
 
 .saveButton:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px var(--rule);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: none;
 }
 
 .saveButton:disabled {
   background: var(--surface-raised);
   color: var(--ink-faint);
   cursor: not-allowed;
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px 0px transparent;
+  transform: none;
+  box-shadow: none;
 }
 
 @keyframes fade-in {
@@ -396,3 +396,15 @@
     transform: translateY(0) scale(1);
   }
 }
+
+.header,
+.body,
+.actions,
+.form,
+.accountContainer {
+  animation: rise-in 0.5s var(--ease-soft) backwards;
+}
+
+.header { animation-delay: 60ms; }
+.body, .form, .accountContainer { animation-delay: 110ms; }
+.actions { animation-delay: 160ms; }

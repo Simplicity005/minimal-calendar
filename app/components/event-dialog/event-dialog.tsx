@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import type { EventType, Room } from "../../types/calendar";
 import styles from "./event-dialog.module.css";
+import { usePresence } from "../../hooks/usePresence";
 
 type Props = {
   isOpen: boolean;
@@ -29,7 +30,8 @@ export function EventDialog({ isOpen, onClose, onSave, rooms, defaultRoomId, def
       setDescription("");
     }
   }, [isOpen, defaultDate, defaultRoomId]);
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+  if (!mounted) return null;
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (await onSave(title, time, type, date, roomId, description)) {
@@ -37,9 +39,9 @@ export function EventDialog({ isOpen, onClose, onSave, rooms, defaultRoomId, def
     }
   };
   return (
-    <div className={styles.backdrop} role="presentation">
+    <div className={styles.backdrop} data-closing={closing ? "true" : undefined} role="presentation">
       <div
-        className={styles.dialog}
+        className={styles.dialog} data-closing={closing ? "true" : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-dialog-title"
