@@ -52,7 +52,7 @@
   width: 100%;
   margin-bottom: 1.5rem;
   padding: 0.8rem;
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-family: "Space Grotesk", sans-serif;
   font-size: 13px;
   text-align: center;
@@ -96,7 +96,7 @@
   height: 42px;
   padding: 0 1rem;
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--surface-raised);
   font-weight: 500;
   color: var(--ink);
@@ -127,7 +127,7 @@
   background: var(--gold);
   color: var(--bg);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
   font-weight: 600;

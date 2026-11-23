@@ -171,15 +171,10 @@
 }
 
 .agendaRow {
-  animation: rise-in 0.45s var(--ease-soft) backwards;
+  animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
   overflow: hidden;
 }
 
-.agendaRow:nth-child(1) { animation-delay: 40ms; }
-.agendaRow:nth-child(2) { animation-delay: 100ms; }
-.agendaRow:nth-child(3) { animation-delay: 160ms; }
-.agendaRow:nth-child(4) { animation-delay: 220ms; }
-.agendaRow:nth-child(n + 5) { animation-delay: 280ms; }
 
 .removing {
   max-height: 120px;
@@ -188,17 +183,5 @@
 }
 
 .emptyState {
-  animation: rise-in 0.5s var(--ease-soft) backwards;
-}
-
-.viewMoreBtn .dot {
-  animation: dot-bounce 1.4s ease-in-out infinite;
-}
-
-.viewMoreBtn .dot:nth-child(2) { animation-delay: 0.15s; }
-.viewMoreBtn .dot:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes dot-bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-3px); }
+  animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
 }

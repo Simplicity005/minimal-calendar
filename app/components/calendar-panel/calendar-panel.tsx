@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isToday, setMonth, setYear, getYear, subDays, addDays } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import type { Room, CalendarEvent } from "../../types/calendar";
 import styles from "./calendar-panel.module.css";
@@ -59,7 +60,7 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
   const [monthEvents, setMonthEvents] = useState<CalendarEvent[]>([]);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
-  const monthMenu = usePresence(monthPickerOpen, 180);
+  const monthMenu = usePresence(monthPickerOpen);
   const monthPickerRef = useRef<HTMLDivElement>(null);
   const yearScrollRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -150,9 +151,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     return { first: rows[0], last: rows[rows.length - 1] };
   }, [gridCells]);
 
-  const nextMonth = addMonths(currentMonth, 1);
-  const miniCells = useMemo(() => buildCells(nextMonth), [nextMonth]);
-
   const handlePrevMonth = () => { setDir('prev'); setCurrentMonth(subMonths(currentMonth, 1)); };
   const handleNextMonth = () => { setDir('next'); setCurrentMonth(addMonths(currentMonth, 1)); };
 
@@ -171,17 +169,17 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
       <div className={styles.poster}>
         <div className={styles.posterLeft}>
           <div className={styles.monthPickerWrapper} ref={monthPickerRef}>
-            <h2
-              className={`${styles.monthHeading} ${monthPickerOpen ? styles.monthHeadingOpen : ""}`}
-              onClick={() => setMonthPickerOpen((o) => !o)}
-              aria-haspopup="listbox"
-              aria-expanded={monthPickerOpen}
-              aria-label={`${format(currentMonth, "MMMM yyyy")} — choose month`}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && setMonthPickerOpen((o) => !o)}
-            >
-              {format(currentMonth, "MMM")}
+            <h2>
+              <button
+                type="button"
+                className={`${styles.monthHeading} ${monthPickerOpen ? styles.monthHeadingOpen : ""}`}
+                onClick={() => setMonthPickerOpen((o) => !o)}
+                aria-haspopup="dialog"
+                aria-expanded={monthPickerOpen}
+                aria-label={`${format(currentMonth, "MMMM yyyy")} — choose month`}
+              >
+                {format(currentMonth, "MMM")}
+              </button>
             </h2>
             {monthMenu.mounted && (
               <div className={styles.monthDropdown} role="dialog" aria-label="Select month and year" data-closing={monthMenu.closing ? "true" : undefined}>
@@ -260,43 +258,17 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
             {format(currentMonth, "MM")}
           </div>
 
-          <div className={styles.yearStack} aria-hidden="true">
-            <span>{yearStr.slice(0, 2)}</span>
-            <span>{yearStr.slice(2)}</span>
-          </div>
+          <span className={styles.year} aria-hidden="true">{yearStr}</span>
         </div>
 
-        <div className={styles.posterRight}>
-          <div className={styles.miniCal} aria-hidden="true">
-            <div className={styles.miniIndex}>{format(nextMonth, "MM")}</div>
-            <div className={styles.miniGrid}>
-              {WEEKDAYS.map((w) => (
-                <span key={w} className={styles.miniWeekday}>{w}</span>
-              ))}
-              {miniCells.map((c) => (
-                <span
-                  key={c.key}
-                  className={`${styles.miniDay} ${c.type === "overflow" ? styles.miniDayHidden : ""}`}
-                >
-                  {c.type === "day" ? format(c.date, "d") : ""}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.navRow}>
-            <button className={styles.navArrow} onClick={handlePrevMonth} aria-label="Previous month">
-              <svg width="28" height="10" viewBox="0 0 28 10" fill="none" aria-hidden="true">
-                <path d="M27 5H1M1 5l4-4M1 5l4 4" stroke="currentColor" strokeWidth="1" />
-              </svg>
-            </button>
-            <button className={styles.navArrow} onClick={handleNextMonth} aria-label="Next month">
-              <svg width="28" height="10" viewBox="0 0 28 10" fill="none" aria-hidden="true">
-                <path d="M1 5h26M27 5l-4-4M27 5l-4 4" stroke="currentColor" strokeWidth="1" />
-              </svg>
-            </button>
-            <button className={styles.addBtn} onClick={onAddEvent}>+ Add event</button>
-          </div>
+        <div className={styles.navRow}>
+          <button type="button" className={styles.navArrow} onClick={handlePrevMonth} aria-label="Previous month">
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          <button type="button" className={styles.navArrow} onClick={handleNextMonth} aria-label="Next month">
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
+          <button type="button" className={styles.addBtn} onClick={onAddEvent}>+ Add event</button>
         </div>
       </div>
 

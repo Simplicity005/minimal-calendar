@@ -24,7 +24,7 @@
   color: var(--ink);
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -72,7 +72,7 @@
 .cornerLogo {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--surface-raised);
   border: 1px solid var(--rule);
   color: var(--gold);
@@ -223,38 +223,15 @@
 
 .layout {
   display: grid;
+  align-items: start;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: 20px;
-}
-
-@media (min-width: 769px) {
-  .layout {
-    align-items: stretch;
-  }
-
-  .layout > .panel {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar > .panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .upcomingPanel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--depth-2);
-}
 }
 
 .panel {
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--depth-2);
 }
@@ -263,13 +240,12 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: var(--depth-2);
 }
 
 .upcomingPanel {
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--depth-2);
 }
@@ -379,7 +355,7 @@
   background: var(--gold);
   color: var(--bg);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 12px;
   font-weight: 600;
   padding: 8px 18px;
@@ -409,7 +385,7 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   color: var(--ink);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 12px;
   font-weight: 500;
   padding: 6px 14px;
@@ -482,7 +458,7 @@
   margin-top: 8px;
   background: var(--surface-raised);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 8px;
   min-width: 210px;
   box-shadow: var(--depth-3);
@@ -525,7 +501,7 @@
   font-size: 14px;
   text-align: left;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
@@ -709,28 +685,6 @@
     gap: 14px;
   }
 }
-.upcomingItem {
-  animation: rise-in 0.45s var(--ease-soft) backwards;
-}
-
-.upcomingItem:nth-child(1) { animation-delay: 120ms; }
-.upcomingItem:nth-child(2) { animation-delay: 180ms; }
-.upcomingItem:nth-child(3) { animation-delay: 240ms; }
-.upcomingItem:nth-child(n + 4) { animation-delay: 300ms; }
-
-.emptyUpcoming {
-  animation: rise-in 0.5s var(--ease-soft) 0.2s backwards;
-}
-
-.roomOption {
-  animation: rise-in 0.35s var(--ease-soft) backwards;
-}
-
-.roomOption:nth-child(2) { animation-delay: 30ms; }
-.roomOption:nth-child(3) { animation-delay: 60ms; }
-.roomOption:nth-child(4) { animation-delay: 90ms; }
-.roomOption:nth-child(n + 5) { animation-delay: 120ms; }
-
 .inviteBtn,
 .membersBtn,
 .headerBtn {
@@ -742,28 +696,28 @@
 }
 /* ── Room switching ── */
 .swapA {
-  animation: room-swap-a 0.55s var(--ease-soft) both;
+  animation: room-swap-a var(--motion-panel) var(--ease-soft) both;
 }
 
 .swapB {
-  animation: room-swap-b 0.55s var(--ease-soft) both;
+  animation: room-swap-b var(--motion-panel) var(--ease-soft) both;
 }
 
 @keyframes room-swap-a {
-  from { opacity: 0; transform: translateY(10px) scale(0.99); filter: blur(4px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes room-swap-b {
-  from { opacity: 0; transform: translateY(10px) scale(0.99); filter: blur(4px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .roomTitle {
-  animation: title-swap 0.5s var(--ease-soft) both;
+  animation: title-swap var(--motion-panel) var(--ease-soft) both;
 }
 
 @keyframes title-swap {
-  from { opacity: 0; transform: translateX(-12px); letter-spacing: 0.06em; }
-  to { opacity: 1; transform: translateX(0); letter-spacing: -0.01em; }
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
 }
