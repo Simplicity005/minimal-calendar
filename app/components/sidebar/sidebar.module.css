@@ -117,14 +117,17 @@
   justify-self: center;
 }
 
-.navItem[aria-current="true"],
 .navItem[aria-pressed="true"] {
   color: var(--ink);
   background: var(--surface-raised);
 }
 
 .navItem[aria-current="true"] {
-  box-shadow: inset 2px 0 var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  box-shadow: var(--accent-glow);
 }
 
 .navItem:disabled {

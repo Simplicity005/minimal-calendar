@@ -47,6 +47,8 @@
   /* Accents */
   --gold: #CFC8BC;
   --accent: #C45F47;
+  --accent-ink: #100D0C;
+  --accent-glow: 0 6px 16px rgba(196, 95, 71, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
   --shadow: transparent;
 
@@ -56,6 +58,7 @@
   --depth-3: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 8px rgba(0, 0, 0, 0.35), 0 24px 56px rgba(0, 0, 0, 0.5);
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --radius: 8px;
+  --radius-pill: 999px;
   --motion-fast: 150ms;
   --motion-panel: 200ms;
   --font-display: "Big Shoulders Display", sans-serif;

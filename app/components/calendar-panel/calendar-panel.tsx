@@ -25,6 +25,29 @@ const MONTH_NAMES = [
 
 const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
+const EVENT_PRIORITY = { exam: 0, quiz: 1, study: 2, general: 3 };
+type EventKind = keyof typeof EVENT_PRIORITY;
+
+function getEventKind(type: string): EventKind {
+  switch (type.trim().toLowerCase()) {
+    case "exam":
+      return "exam";
+    case "quiz":
+      return "quiz";
+    case "study":
+    case "study session":
+      return "study";
+    default:
+      return "general";
+  }
+}
+
+function getEventLabel(type: string) {
+  const label = type.trim() || "General";
+  const text = label === label.toUpperCase() ? label.toLowerCase() : label;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 const ITEM_HEIGHT = 36; // px — height of each year row in the drum wheel
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 21 }, (_, i) => THIS_YEAR - 10 + i);
@@ -140,6 +163,25 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
 
   const gridCells = useMemo(() => buildCells(currentMonth), [currentMonth]);
   const rowCount = gridCells.length / 7;
+  const eventsByDate = useMemo(() => {
+    const days = new Map<string, { event: CalendarEvent; kind: EventKind }[]>();
+
+    for (const event of monthEvents) {
+      const markers = days.get(event.event_date) ?? [];
+      markers.push({ event, kind: getEventKind(event.event_type) });
+      days.set(event.event_date, markers);
+    }
+
+    for (const markers of days.values()) {
+      markers.sort((a, b) =>
+        EVENT_PRIORITY[a.kind] - EVENT_PRIORITY[b.kind] ||
+        a.event.event_time.localeCompare(b.event.event_time) ||
+        a.event.id.localeCompare(b.event.id)
+      );
+    }
+
+    return days;
+  }, [monthEvents]);
 
   // Rows whose Sunday belongs to this month → continuous vertical capsule
   const sundayRange = useMemo(() => {
@@ -153,14 +195,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
 
   const handlePrevMonth = () => { setDir('prev'); setCurrentMonth(subMonths(currentMonth, 1)); };
   const handleNextMonth = () => { setDir('next'); setCurrentMonth(addMonths(currentMonth, 1)); };
-
-  const getDotClass = (type: string) => {
-    const t = type.toLowerCase();
-    if (t === "exam") return styles.dotExam;
-    if (t === "quiz") return styles.dotQuiz;
-    if (t === "study") return styles.dotStudy;
-    return styles.dotGeneral;
-  };
 
   const yearStr = format(currentMonth, "yyyy");
 
@@ -301,8 +335,8 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
             );
           }
 
-          const dateStr = format(cell.date, "yyyy-MM-dd");
-          const dayEvents = monthEvents.filter(e => e.event_date === dateStr);
+          const dayEvents = eventsByDate.get(cell.key) ?? [];
+          const featured = dayEvents[0];
           const isSelected = selectedDate && isSameDay(cell.date, selectedDate);
           const isTodayDate = isToday(cell.date);
 
@@ -311,19 +345,25 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
               key={cell.key}
               className={`${styles.cell} ${styles.dayCell} ${isSelected ? styles.selected : ""} ${isTodayDate ? styles.today : ""}`}
               onClick={() => onSelectDate(cell.date)}
-              title={dayEvents.map(e => e.title).join(" · ") || undefined}
+              title={dayEvents.map(({ event }) => event.title).join(" · ") || undefined}
             >
               <span className={styles.date}>{format(cell.date, "d")}</span>
 
-              {dayEvents.length > 0 && (
-                <div className={styles.eventDots}>
-                  {dayEvents.slice(0, 3).map(ev => (
-                    <span
-                      key={ev.id}
-                      className={`${styles.dot} ${getDotClass(ev.event_type)}`}
-                    />
-                  ))}
-                </div>
+              {featured && (
+                <>
+                  <div className={styles.eventDots} aria-hidden="true">
+                    {dayEvents.map(({ event, kind }, index) => (
+                      <span
+                        key={event.id}
+                        className={index === 0 ? `${styles.dot} ${styles.featuredDot}` : styles.dot}
+                        data-event-kind={kind}
+                      />
+                    ))}
+                  </div>
+                  <span className={styles.eventPill} data-event-kind={featured.kind}>
+                    {getEventLabel(featured.event.event_type)}
+                  </span>
+                </>
               )}
             </div>
           );
@@ -331,9 +371,9 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
       </div>
 
       <div className={styles.legend}>
-        <span><span className={`${styles.dot} ${styles.dotExam}`}></span>Exam</span>
-        <span><span className={`${styles.dot} ${styles.dotQuiz}`}></span>Quiz</span>
-        <span><span className={`${styles.dot} ${styles.dotStudy}`}></span>Study session</span>
+        <span><span className={styles.dot} data-event-kind="exam" />Exam</span>
+        <span><span className={styles.dot} data-event-kind="quiz" />Quiz</span>
+        <span><span className={styles.dot} data-event-kind="study" />Study session</span>
       </div>
     </div>
   );
