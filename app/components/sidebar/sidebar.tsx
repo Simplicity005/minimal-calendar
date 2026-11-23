@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  User,
-  LogOut,
-  Plus,
-  Hash,
   Bell,
   BellOff,
+  Calendar,
+  Hash,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  User,
+  X,
 } from "lucide-react";
 import type { Room } from "../../types/calendar";
 import styles from "./sidebar.module.css";
@@ -53,242 +54,174 @@ export function Sidebar({
   isNotifLoading = false,
   onToggleNotifications,
 }: Props) {
-  const [hoveredTooltip, setHoveredTooltip] = useState<{
-    text: string;
-    top: number;
-  } | null>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const toggleButton = useRef<HTMLButtonElement>(null);
+  const sidebar = useRef<HTMLElement>(null);
 
-  const personalRoom = rooms.find((r) => r.name === "Personal Calendar");
-  const sharedRooms = rooms.filter((r) => r.name !== "Personal Calendar");
-  const initial = userName ? userName.charAt(0).toUpperCase() : "U";
+  useEffect(() => {
+    if (!isMobileOpen) return;
+    const opener = document.activeElement;
+    const panel = sidebar.current;
+    closeButton.current?.focus();
 
-  const handleMouseEnter = (
-    text: string,
-    e: React.MouseEvent<HTMLElement>
-  ) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setHoveredTooltip({
-      text,
-      top: rect.top + rect.height / 2,
-    });
-  };
+    return () => {
+      if (
+        opener instanceof HTMLElement &&
+        (panel?.contains(document.activeElement) || document.activeElement === document.body)
+      ) {
+        opener.focus();
+      }
+    };
+  }, [isMobileOpen]);
 
-  const handleMouseLeave = () => {
-    setHoveredTooltip(null);
+  const personalRoom = rooms.find((room) => room.name === "Personal Calendar");
+  const sharedRooms = rooms.filter((room) => room.name !== "Personal Calendar");
+  const orderedRooms = personalRoom ? [personalRoom, ...sharedRooms] : sharedRooms;
+  const accountName = userName || userEmail;
+  const toggleLabel = isExpanded ? "Collapse sidebar" : "Expand sidebar";
+  const notificationsLabel = isSubscribed ? "Notifications on" : "Enable notifications";
+
+  const closeSidebar = () => {
+    if (isMobileOpen) {
+      setIsMobileOpen(false);
+    } else {
+      toggleButton.current?.focus();
+      setIsExpanded(false);
+    }
   };
 
   return (
     <>
-      {/* Overlay */}
       <div
-        className={`${styles.overlay} ${isExpanded ? styles.expanded : ''} ${isMobileOpen ? styles.mobileOpen : ''}`}
-        onClick={() => {
-          setIsMobileOpen(false);
-          setIsExpanded(false);
-        }}
+        className={styles.overlay}
+        data-expanded={isExpanded}
+        data-mobile-open={isMobileOpen}
+        onClick={closeSidebar}
+        aria-hidden="true"
       />
 
       <aside
-        className={`${styles.sidebar} ${
-          isExpanded ? styles.expanded : styles.collapsed
-        } ${isMobileOpen ? styles.mobileOpen : ""}`}
-        aria-label="Application Sidebar"
+        id="app-sidebar"
+        ref={sidebar}
+        className={styles.sidebar}
+        data-expanded={isExpanded}
+        data-mobile-open={isMobileOpen}
+        aria-label="Calendar sidebar"
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && (isExpanded || isMobileOpen)) {
+            event.stopPropagation();
+            closeSidebar();
+          }
+        }}
       >
-        {/* Header & Logo */}
-        <div className={styles.sidebarHeader}>
-          <Link
-            href="/"
-            className={styles.brandGroup}
-            onMouseEnter={(e) => handleMouseEnter("Align Home", e)}
-            onMouseLeave={handleMouseLeave}
-            title="Align Home"
-          >
-            <div className={styles.logo}>A</div>
-            <div className={styles.brandText}>
-              <span className={styles.brandTitle}>Align</span>
-              <span className={styles.brandSubtitle}>Shared Calendar</span>
-            </div>
-          </Link>
-
-          {/* Toggle Arrow */}
+        <header className={styles.header}>
           <button
+            ref={toggleButton}
             type="button"
-            className={styles.toggleBtn}
-            onClick={() => {
-              setIsExpanded(!isExpanded);
-              setHoveredTooltip(null);
-            }}
-            onMouseEnter={(e) =>
-              handleMouseEnter(
-                isExpanded ? "Collapse Sidebar" : "Expand Sidebar",
-                e
-              )
-            }
-            onMouseLeave={handleMouseLeave}
-            aria-label={isExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
-            title={isExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
+            className={styles.desktopToggle}
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-controls="app-sidebar"
+            aria-expanded={isExpanded}
+            aria-label={toggleLabel}
+            title={toggleLabel}
           >
-            {isExpanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+            {isExpanded ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
           </button>
-        </div>
+          <button
+            ref={closeButton}
+            type="button"
+            className={styles.mobileClose}
+            onClick={closeSidebar}
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
+          <Link href="/" className={styles.brand} onClick={closeSidebar}>
+            Align
+          </Link>
+        </header>
 
-        {/* Navigation Body */}
-        <div className={styles.sidebarBody}>
-          {/* Spaces Section */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>My Spaces</div>
-
-            {/* Personal Calendar */}
-            {personalRoom && (
-              <button
-                type="button"
-                className={`${styles.navItem} ${
-                  activeRoom?.id === personalRoom.id ? styles.navItemActive : ""
-                }`}
-                onClick={() => onSelectRoom(personalRoom.id)}
-                onMouseEnter={(e) => handleMouseEnter("Personal Calendar", e)}
-                onMouseLeave={handleMouseLeave}
-              >
-                <div className={styles.itemIcon}>
-                  <Calendar size={18} />
-                </div>
-                <span className={styles.itemLabel}>Personal Calendar</span>
-              </button>
-            )}
-
-            {/* Shared Rooms */}
-            {sharedRooms.map((room) => {
-              const isActive = activeRoom?.id === room.id;
-              return (
-                <button
-                  key={room.id}
-                  type="button"
-                  className={`${styles.navItem} ${
-                    isActive ? styles.navItemActive : ""
-                  }`}
-                  onClick={() => onSelectRoom(room.id)}
-                  onMouseEnter={(e) => handleMouseEnter(room.name, e)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <div className={styles.itemIcon}>
-                    <Hash size={18} />
-                  </div>
-                  <span className={styles.itemLabel}>{room.name}</span>
-                </button>
-              );
-            })}
-
-            {/* Add / Join Space */}
+        <nav className={styles.body} aria-label="My spaces">
+          <div className={styles.sectionHeader} aria-hidden="true">My spaces</div>
+          {orderedRooms.map((room) => (
             <button
+              key={room.id}
               type="button"
               className={styles.navItem}
-              onClick={onOpenManageRooms}
-              onMouseEnter={(e) => handleMouseEnter("Create or Join Space", e)}
-              onMouseLeave={handleMouseLeave}
+              aria-current={activeRoom?.id === room.id ? "true" : undefined}
+              onClick={() => {
+                onSelectRoom(room.id);
+                closeSidebar();
+              }}
+              title={room.name}
             >
-              <div className={styles.itemIcon}>
-                <Plus size={18} />
-              </div>
-              <span className={styles.itemLabel}>Create or Join Space</span>
+              {room === personalRoom ? <Calendar size={18} /> : <Hash size={18} />}
+              <span className={styles.label}>{room.name}</span>
             </button>
-          </div>
-        </div>
-
-        {/* Footer Section */}
-        <div className={styles.sidebarFooter}>
-          {/* Notifications Toggle */}
-          {isNotifSupported && (
-            <button
-              type="button"
-              className={`${styles.navItem} ${isSubscribed ? styles.notifActive : ""}`}
-              onClick={onToggleNotifications}
-              disabled={isNotifLoading}
-              onMouseEnter={(e) =>
-                handleMouseEnter(
-                  isSubscribed ? "Notifications On" : "Enable Notifications",
-                  e
-                )
-              }
-              onMouseLeave={handleMouseLeave}
-              aria-label={isSubscribed ? "Disable event notifications" : "Enable event notifications"}
-            >
-              <div className={styles.itemIcon}>
-                {isSubscribed ? (
-                  <Bell size={18} className={styles.bellActive} />
-                ) : (
-                  <BellOff size={18} />
-                )}
-              </div>
-              <span className={styles.itemLabel}>
-                {isNotifLoading
-                  ? "Please wait..."
-                  : isSubscribed
-                  ? "Notifications On"
-                  : "Enable Notifications"}
-              </span>
-            </button>
-          )}
-
-          {/* Manage Account (Dedicated) */}
+          ))}
           <button
             type="button"
             className={styles.navItem}
-            onClick={onOpenManageAccount}
-            onMouseEnter={(e) => handleMouseEnter("Manage Account", e)}
-            onMouseLeave={handleMouseLeave}
+            onClick={() => {
+              closeSidebar();
+              onOpenManageRooms();
+            }}
+            title="Create or join space"
           >
-            <div className={styles.itemIcon}>
-              <User size={18} />
-            </div>
-            <span className={styles.itemLabel}>Manage Account</span>
+            <Plus size={18} />
+            <span className={styles.label}>Create or join space</span>
           </button>
+        </nav>
 
-          {/* Sign Out */}
+        <footer className={styles.footer}>
+          {isNotifSupported && (
+            <button
+              type="button"
+              className={styles.navItem}
+              onClick={onToggleNotifications}
+              disabled={isNotifLoading}
+              aria-label="Event notifications"
+              aria-pressed={isSubscribed}
+              title={notificationsLabel}
+            >
+              {isSubscribed ? <Bell size={18} /> : <BellOff size={18} />}
+              <span className={styles.label}>
+                {isNotifLoading ? "Please wait…" : notificationsLabel}
+              </span>
+            </button>
+          )}
           <button
             type="button"
-            className={`${styles.navItem} ${styles.dangerNavItem}`}
-            onClick={onSignOut}
-            onMouseEnter={(e) => handleMouseEnter("Sign Out", e)}
-            onMouseLeave={handleMouseLeave}
+            className={styles.navItem}
+            onClick={() => {
+              closeSidebar();
+              onSignOut();
+            }}
+            title="Sign out"
           >
-            <div className={styles.itemIcon}>
-              <LogOut size={18} />
-            </div>
-            <span className={styles.itemLabel}>Sign Out</span>
+            <LogOut size={18} />
+            <span className={styles.label}>Sign out</span>
           </button>
-
-          {/* User Card */}
-          {(userName || userEmail) && (
-            <div
-              className={styles.userCard}
-              onClick={onOpenManageAccount}
-              style={{ cursor: "pointer" }}
-              onMouseEnter={(e) =>
-                handleMouseEnter(`Account: ${userName || userEmail}`, e)
-              }
-              onMouseLeave={handleMouseLeave}
-            >
-              <div className={styles.userAvatar}>{initial}</div>
-              <div className={styles.userInfo}>
-                <span className={styles.userName}>{userName || "User"}</span>
-                <span className={styles.userEmail}>{userEmail || ""}</span>
-              </div>
-            </div>
-          )}
-        </div>
+          <button
+            type="button"
+            className={styles.account}
+            onClick={() => {
+              closeSidebar();
+              onOpenManageAccount();
+            }}
+            aria-label={accountName ? `Manage account for ${accountName}` : "Manage account"}
+            title="Manage account"
+          >
+            <span className={styles.avatar} aria-hidden="true">
+              {accountName ? accountName.charAt(0).toUpperCase() : <User size={16} />}
+            </span>
+            <span className={styles.accountInfo}>
+              <span className={styles.accountName}>{userName || "Manage account"}</span>
+              {userEmail && <span className={styles.accountEmail}>{userEmail}</span>}
+            </span>
+          </button>
+        </footer>
       </aside>
-
-      {/* Unclipped Global Floating Tooltip */}
-      {hoveredTooltip && (
-        <div
-          className={`${styles.floatingTooltip} ${
-            isExpanded ? styles.expandedFloatingTooltip : ""
-          }`}
-          style={{ top: `${hoveredTooltip.top}px` }}
-        >
-          {hoveredTooltip.text}
-        </div>
-      )}
     </>
   );
 }

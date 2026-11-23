@@ -320,10 +320,10 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
           />
         )}
 
-        {gridCells.map((cell, idx) => {
+        {gridCells.map((cell) => {
           if (cell.type === "overflow") {
             return (
-              <div key={cell.key} className={`${styles.cell} ${styles.overflow}`} style={{ ["--i" as string]: idx }}>
+              <div key={cell.key} className={`${styles.cell} ${styles.overflow}`}>
                 <span className={styles.date}>{format(cell.date, "d")}</span>
               </div>
             );
@@ -338,7 +338,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
             <div
               key={cell.key}
               className={`${styles.cell} ${styles.dayCell} ${isSelected ? styles.selected : ""} ${isTodayDate ? styles.today : ""}`}
-              style={{ ["--i" as string]: idx }}
               onClick={() => onSelectDate(cell.date)}
               title={dayEvents.map(e => e.title).join(" · ") || undefined}
             >

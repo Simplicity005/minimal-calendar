@@ -192,7 +192,6 @@
   z-index: 0;
   pointer-events: none;
   transform-origin: top;
-  animation: pill-in 0.7s var(--ease-soft) 0.1s both;
 }
 
 .cell {
@@ -201,8 +200,6 @@
   padding: 6px 8px;
   display: flex;
   flex-direction: column;
-  animation: cell-in 0.45s var(--ease-soft) backwards;
-  animation-delay: calc(var(--i, 0) * 9ms);
 }
 
 .dayCell {
@@ -541,31 +538,21 @@
   animation: pop 0.45s var(--ease-soft) both;
 }
 
-@keyframes cell-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pill-in {
-  from { transform: scaleY(0); opacity: 0; }
-  to { transform: scaleY(1); opacity: 0.88; }
-}
-
 @keyframes underline-in {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
 
-.slideNext { --shift: 14px; }
-.slidePrev { --shift: -14px; }
+.slideNext { --shift: 8px; }
+.slidePrev { --shift: -8px; }
 
-.slideNext .cell,
-.slidePrev .cell {
-  animation-name: cell-slide;
+.slideNext,
+.slidePrev {
+  animation: grid-slide 180ms var(--ease-soft) backwards;
 }
 
-@keyframes cell-slide {
-  from { opacity: 0; transform: translateX(var(--shift)); }
+@keyframes grid-slide {
+  from { opacity: 0.7; transform: translateX(var(--shift)); }
   to { opacity: 1; transform: translateX(0); }
 }
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { format, addDays, startOfDay } from "date-fns";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Plus, Settings, ChevronDown, UserPlus, Users, Menu } from "lucide-react";
+import { LogOut, Plus, Settings, ChevronDown, UserPlus, Users, PanelLeftOpen } from "lucide-react";
 import { CalendarPanel } from "./components/calendar-panel/calendar-panel";
 import { EventDialog } from "./components/event-dialog/event-dialog";
 import { RoomDialog } from "./components/room-dialog/room-dialog";
@@ -325,9 +325,11 @@ export default function Home() {
       <button 
         className={styles.mobileHamburger}
         onClick={() => setIsMobileOpen(true)}
-        aria-label="Open menu"
+        aria-label="Open sidebar"
+        aria-controls="app-sidebar"
+        aria-expanded={isMobileOpen}
       >
-        <Menu size={20} />
+        <PanelLeftOpen size={18} />
       </button>
 
       <Sidebar
@@ -349,7 +351,7 @@ export default function Home() {
         onToggleNotifications={handleToggleNotifications}
       />
       <div className={styles.page}>
-        <div className={`${styles.letterhead} animate-in`} style={{ animationDelay: "100ms" }}>
+        <div className={styles.letterhead}>
           <div className={styles.mark}>
             <div className={styles.roomHeaderGroup}>
               <div
@@ -415,7 +417,7 @@ export default function Home() {
 
         <div className={`${styles.layout} ${swap % 2 ? styles.swapA : styles.swapB}`}>
           {/* Left panel: calendar */}
-          <div className={`${styles.panel} animate-in`} style={{ animationDelay: "200ms" }}>
+          <div className={styles.panel}>
             <CalendarPanel
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
@@ -428,7 +430,7 @@ export default function Home() {
           </div>
 
           {/* Right sidebar: Agenda + Stamp */}
-          <div className={`${styles.sidebar} animate-in`} style={{ animationDelay: "300ms" }}>
+          <div className={styles.sidebar}>
             <div className={styles.panel}>
               <EventList
                 selectedDate={selectedDate}

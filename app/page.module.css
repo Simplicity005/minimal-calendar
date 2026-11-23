@@ -6,7 +6,6 @@
   width: 100%;
   min-height: 100vh;
   position: relative;
-  animation: pageFadeIn 500ms ease forwards;
 }
 
 .mobileHamburger {
@@ -18,13 +17,14 @@
   background: var(--surface-raised);
   border: 1px solid var(--rule);
   color: var(--ink);
-  padding: 8px;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   cursor: pointer;
   align-items: center;
   justify-content: center;
   box-shadow: var(--depth-1);
-  transition: all 0.28s var(--ease-soft);
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .mobileHamburger:active {
@@ -39,16 +39,6 @@
   }
   .mobileHamburger {
     display: flex;
-  }
-}
-
-@keyframes pageFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
   }
 }
 
