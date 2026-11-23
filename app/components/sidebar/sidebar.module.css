@@ -61,6 +61,13 @@
   transition: background-color 120ms ease, color 120ms ease;
 }
 
+.navItem,
+.account {
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-panel) var(--ease-soft),
+    color var(--motion-fast) ease, box-shadow var(--motion-panel) var(--ease-soft);
+}
+
 .desktopToggle,
 .mobileClose {
   flex: 0 0 var(--item-width);
@@ -123,10 +130,8 @@
 }
 
 .navItem[aria-current="true"] {
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 600;
+  background: var(--accent-glow-fill);
+  color: var(--room-selection-ink);
   box-shadow: var(--accent-glow);
 }
 

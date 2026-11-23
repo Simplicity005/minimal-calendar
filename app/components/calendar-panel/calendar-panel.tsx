@@ -3,15 +3,14 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isToday, setMonth, setYear, getYear, subDays, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { supabase } from "../../../lib/supabase";
 import type { Room, CalendarEvent } from "../../types/calendar";
 import styles from "./calendar-panel.module.css";
 import { usePresence } from "../../hooks/usePresence";
+import { useCalendarEvents } from "../../hooks/useCalendarEvents";
 
 type Props = {
   selectedDate: Date | undefined;
   onSelectDate: (date: Date) => void;
-  eventDates?: string[];
   onAddEvent: () => void;
   activeRoom: Room | null;
   rooms: Room[];
@@ -80,7 +79,13 @@ function buildCells(month: Date): Cell[] {
 
 export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRoom, rooms, refreshTrigger }: Props) {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDate || new Date()));
-  const [monthEvents, setMonthEvents] = useState<CalendarEvent[]>([]);
+  const { events: monthEvents, isLoading: isMonthLoading } = useCalendarEvents(
+    activeRoom,
+    rooms,
+    format(startOfMonth(currentMonth), "yyyy-MM-dd"),
+    format(endOfMonth(currentMonth), "yyyy-MM-dd"),
+    refreshTrigger,
+  );
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const monthMenu = usePresence(monthPickerOpen);
@@ -137,29 +142,6 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
     setCurrentMonth(startOfMonth(setMonth(currentMonth, monthIndex)));
     setMonthPickerOpen(false);
   };
-
-  // Fetch events for the current month
-  const fetchMonthEvents = useCallback(async () => {
-    if (rooms.length === 0) { setMonthEvents([]); return; }
-
-    const start = format(startOfMonth(currentMonth), "yyyy-MM-dd");
-    const end = format(endOfMonth(currentMonth), "yyyy-MM-dd");
-
-    let query = supabase.from("events").select("*").gte("event_date", start).lte("event_date", end);
-    if (activeRoom && activeRoom.name !== "Personal Calendar") {
-      query = query.eq("calendar_id", activeRoom.id);
-    } else {
-      query = query.in("calendar_id", rooms.map((r) => r.id));
-    }
-
-    const { data, error } = await query;
-    if (error) console.error("Error fetching month events:", error);
-    else setMonthEvents((data ?? []) as CalendarEvent[]);
-  }, [currentMonth, activeRoom, rooms]);
-
-  useEffect(() => {
-    fetchMonthEvents();
-  }, [fetchMonthEvents, refreshTrigger]);
 
   const gridCells = useMemo(() => buildCells(currentMonth), [currentMonth]);
   const rowCount = gridCells.length / 7;
@@ -314,6 +296,7 @@ export function CalendarPanel({ selectedDate, onSelectDate, onAddEvent, activeRo
         className={`${styles.grid} ${dir === "next" ? styles.slideNext : styles.slidePrev}`}
         key={currentMonth.toString()}
         style={{ ["--rows" as string]: rowCount }}
+        aria-busy={isMonthLoading}
       >
         {sundayRange && (
           <div

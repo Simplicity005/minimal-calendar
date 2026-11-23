@@ -27,6 +27,7 @@
 .agendaList {
   display: flex;
   flex-direction: column;
+  min-block-size: 83px;
 }
 
 .agendaRow {
@@ -184,4 +185,8 @@
 
 .emptyState {
   animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
+}
+
+.agendaList[aria-busy="true"] .emptyState {
+  animation-delay: 140ms;
 }

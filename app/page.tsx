@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { format, addDays, startOfDay } from "date-fns";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { LogOut, Plus, Settings, ChevronDown, UserPlus, Users, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, UserPlus, Users, PanelLeftOpen } from "lucide-react";
 import { CalendarPanel } from "./components/calendar-panel/calendar-panel";
 import { EventDialog } from "./components/event-dialog/event-dialog";
 import { RoomDialog } from "./components/room-dialog/room-dialog";
@@ -22,6 +21,7 @@ import { supabase } from "../lib/supabase";
 import type { CalendarEvent, EventType, Room } from "./types/calendar";
 import { useNotifications } from "./hooks/useNotifications";
 import { usePresence } from "./hooks/usePresence";
+import { useCalendarEvents } from "./hooks/useCalendarEvents";
 
 export default function Home() {
   const router = useRouter();
@@ -42,22 +42,24 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUpcomingExpanded, setIsUpcomingExpanded] = useState(false);
   const roomMenu = usePresence(isDropdownOpen, 180);
-  const [swap, setSwap] = useState(0);
-  const activeRoomId = activeRoom?.id;
-  useEffect(() => { setSwap((s) => s + 1); }, [activeRoomId]);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   // Calendar state
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
-  const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
-  const [allEventDates, setAllEventDates] = useState<string[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const selectedDay = selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined;
+  const today = startOfDay(new Date());
+  const todayKey = format(today, "yyyy-MM-dd");
+  const { events, isLoading: isAgendaLoading } = useCalendarEvents(
+    activeRoom, rooms, selectedDay, selectedDay, refreshTrigger,
+  );
+  const { events: upcomingEvents, isLoading: isUpcomingLoading } = useCalendarEvents(
+    activeRoom, rooms, todayKey, format(addDays(today, 7), "yyyy-MM-dd"), refreshTrigger,
+  );
 
   // Notifications
   const { isSupported: isNotifSupported, isSubscribed, isLoading: isNotifLoading, subscribe, unsubscribe } = useNotifications();
@@ -169,46 +171,6 @@ export default function Home() {
     }
   };
 
-  // Fetch events for selected date
-  const fetchEvents = useCallback(async () => {
-    if (!selectedDate || rooms.length === 0) { setEvents([]); return; }
-    setLoading(true);
-    const formattedDate = format(selectedDate, "yyyy-MM-dd");
-    let query = supabase.from("events").select("*").eq("event_date", formattedDate);
-    if (activeRoom && activeRoom.name !== "Personal Calendar") {
-      query = query.eq("calendar_id", activeRoom.id);
-    } else {
-      query = query.in("calendar_id", rooms.map((r) => r.id));
-    }
-    const { data, error } = await query.order("event_time", { ascending: true });
-    if (error) console.error("Error fetching events:", error);
-    else setEvents((data ?? []) as CalendarEvent[]);
-    setLoading(false);
-  }, [selectedDate, activeRoom, rooms]);
-
-  // Fetch upcoming 7 days
-  const fetchUpcomingEvents = useCallback(async () => {
-    if (rooms.length === 0) { setUpcomingEvents([]); setAllEventDates([]); return; }
-    const today = startOfDay(new Date());
-    const fromDate = format(today, "yyyy-MM-dd");
-    const toDate = format(addDays(today, 8), "yyyy-MM-dd");
-    let query = supabase.from("events").select("*").gte("event_date", fromDate).lt("event_date", toDate);
-    if (activeRoom && activeRoom.name !== "Personal Calendar") {
-      query = query.eq("calendar_id", activeRoom.id);
-    } else {
-      query = query.in("calendar_id", rooms.map((r) => r.id));
-    }
-    const { data, error } = await query.order("event_date").order("event_time");
-    if (error) { console.error("Error fetching upcoming:", error); return; }
-    const all = (data ?? []) as CalendarEvent[];
-    setUpcomingEvents(all);
-    setAllEventDates([...new Set(all.map((e) => e.event_date))]);
-  }, [activeRoom, rooms]);
-
-  useEffect(() => {
-    if (userId) { void fetchEvents(); void fetchUpcomingEvents(); }
-  }, [fetchEvents, fetchUpcomingEvents, userId]);
-
   const handleAddEvent = async (title: string, time: string, type: EventType, date: string, roomId: string, description: string) => {
     if (!userId) return false;
     const { error } = await supabase.from("events").insert([{
@@ -221,7 +183,6 @@ export default function Home() {
       created_by: userId,
     }]);
     if (error) { console.error("Error adding event:", error); alert("Failed to add event"); return false; }
-    await Promise.all([fetchEvents(), fetchUpcomingEvents()]);
     setRefreshTrigger(prev => prev + 1);
     return true;
   };
@@ -230,7 +191,6 @@ export default function Home() {
     const { error } = await supabase.from("events").delete().eq("id", id);
     if (error) { console.error("Error deleting event:", error); alert("Failed to delete event"); }
     else {
-      await Promise.all([fetchEvents(), fetchUpcomingEvents()]);
       setRefreshTrigger(prev => prev + 1);
     }
   };
@@ -415,13 +375,12 @@ export default function Home() {
           )}
         </div>
 
-        <div className={`${styles.layout} ${swap % 2 ? styles.swapA : styles.swapB}`}>
+        <div className={styles.layout}>
           {/* Left panel: calendar */}
           <div className={styles.panel}>
             <CalendarPanel
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
-              eventDates={allEventDates}
               onAddEvent={() => setIsEventModalOpen(true)}
               activeRoom={activeRoom}
               rooms={rooms}
@@ -435,7 +394,7 @@ export default function Home() {
               <EventList
                 selectedDate={selectedDate}
                 events={events}
-                isLoading={loading}
+                isLoading={isAgendaLoading}
                 onDeleteEvent={handleDeleteEvent}
                 onAddEvent={() => setIsEventModalOpen(true)}
                 onEventClick={(ev) => setSelectedEvent(ev)}
@@ -444,9 +403,13 @@ export default function Home() {
             </div>
             <div className={styles.upcomingPanel}>
               <h3 className={styles.upcomingTitle}>Later This Week</h3>
-              <div className={styles.upcomingList}>
+              <div className={styles.upcomingList} aria-busy={isUpcomingLoading}>
                 {(() => {
-                  const future = upcomingEvents.filter(e => e.event_date !== format(new Date(), "yyyy-MM-dd"));
+                  if (isUpcomingLoading) {
+                    return <p className={styles.emptyUpcoming}>Loading upcoming events…</p>;
+                  }
+
+                  const future = upcomingEvents.filter(e => e.event_date !== todayKey);
                   if (future.length === 0) {
                     return <p className={styles.emptyUpcoming}>No upcoming events this week.</p>;
                   }

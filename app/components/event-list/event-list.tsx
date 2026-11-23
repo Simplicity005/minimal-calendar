@@ -56,7 +56,7 @@ export function EventList({
         {selectedDate && <span className={styles.dateArrow}>{displayDate} →</span>}
       </div>
 
-      <div className={styles.agendaList}>
+      <div className={styles.agendaList} aria-busy={isLoading}>
         {isLoading ? (
           <div className={styles.emptyState}>Loading agenda...</div>
         ) : events.length === 0 ? (

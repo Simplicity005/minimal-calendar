@@ -47,7 +47,8 @@
   /* Accents */
   --gold: #CFC8BC;
   --accent: #C45F47;
-  --accent-ink: #100D0C;
+  --accent-glow-fill: color-mix(in srgb, var(--accent) 90%, var(--surface));
+  --room-selection-ink: #FFF9F4;
   --accent-glow: 0 6px 16px rgba(196, 95, 71, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
   --shadow: transparent;

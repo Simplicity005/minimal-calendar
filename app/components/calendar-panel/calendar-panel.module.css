@@ -140,8 +140,7 @@
   left: calc(100% * 6 / 7 + 8px);
   width: calc(100% / 7 - 16px);
   border-radius: var(--radius-pill);
-  background: var(--accent);
-  opacity: 0.9;
+  background: var(--accent-glow-fill);
   box-shadow: var(--accent-glow);
   z-index: 0;
   pointer-events: none;
@@ -156,7 +155,7 @@
 
 @keyframes sunday-glow-in {
   from { opacity: 0; transform: scaleY(0); }
-  to { opacity: 0.9; transform: scaleY(1); }
+  to { opacity: 1; transform: scaleY(1); }
 }
 
 .cell {
@@ -223,6 +222,16 @@
 
 .eventPill {
   display: none;
+}
+
+.eventDots,
+.eventPill {
+  animation: marker-in var(--motion-panel) var(--ease-soft) backwards;
+}
+
+@keyframes marker-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dot {

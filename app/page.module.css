@@ -179,6 +179,7 @@
 .membersWrapper {
   display: flex;
   align-items: center;
+  min-block-size: 18px;
 }
 
 .membersBtn {
@@ -266,6 +267,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-block-size: 42px;
 }
 
 .upcomingItem {
@@ -273,6 +275,7 @@
   align-items: baseline;
   gap: 12px;
   transition: transform 0.2s var(--ease-soft);
+  animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
 }
 
 .upcomingItem:hover {
@@ -310,6 +313,11 @@
   font-size: 13px;
   color: var(--ink-dim);
   font-style: italic;
+  animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
+}
+
+.upcomingList[aria-busy="true"] .emptyUpcoming {
+  animation-delay: 140ms;
 }
 
 .viewMoreBtn {
@@ -501,20 +509,18 @@
   font-size: 14px;
   text-align: left;
   padding: 8px 12px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background-color var(--motion-panel) var(--ease-soft), color var(--motion-fast) ease;
 }
 
-.roomOption:hover {
+.roomOption:not(.roomOptionActive):hover {
   background: var(--rule-soft);
-  transform: translateX(2px);
 }
 
 .roomOptionActive {
-  background: rgba(203, 184, 158, 0.12);
-  color: var(--gold);
-  font-weight: 600;
+  background: var(--accent-glow-fill);
+  color: var(--room-selection-ink);
 }
 
 @media (max-width: 768px) {
@@ -694,30 +700,6 @@
 .membersBtn:hover {
   transform: translateX(2px);
 }
-/* ── Room switching ── */
-.swapA {
-  animation: room-swap-a var(--motion-panel) var(--ease-soft) both;
-}
-
-.swapB {
-  animation: room-swap-b var(--motion-panel) var(--ease-soft) both;
-}
-
-@keyframes room-swap-a {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes room-swap-b {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .roomTitle {
-  animation: title-swap var(--motion-panel) var(--ease-soft) both;
-}
-
-@keyframes title-swap {
-  from { opacity: 0; transform: translateX(-4px); }
-  to { opacity: 1; transform: translateX(0); }
+  animation: rise-in var(--motion-panel) var(--ease-soft) backwards;
 }
