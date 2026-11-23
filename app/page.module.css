@@ -1,5 +1,10 @@
 .appShell {
-  padding: 22px 20px 12px 88px;
+  --sidebar-rail-width: 68px;
+  --sidebar-panel-width: 250px;
+  --workspace-width: 960px;
+  --workspace-gutter: 20px;
+  padding: 22px var(--workspace-gutter) 12px;
+  padding-inline-start: calc(var(--sidebar-rail-width) + var(--workspace-gutter));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,12 +38,22 @@
 }
 
 @media (max-width: 768px) {
-  .appShell {
-    padding: 24px 16px 16px;
-    padding-top: 80px;
-  }
   .mobileHamburger {
     display: flex;
+  }
+}
+
+@media (min-width: 1280px) {
+  .appShell {
+    --workspace-width: 1320px;
+    --workspace-gutter: clamp(24px, 2.5vw, 48px);
+    padding-block-start: 32px;
+    padding-inline-start: calc(var(--sidebar-panel-width) + var(--workspace-gutter));
+  }
+
+  .appShell .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 32%);
+    gap: 24px;
   }
 }
 
@@ -117,7 +132,7 @@
 
 .page {
   width: 100%;
-  max-width: 960px;
+  max-width: var(--workspace-width);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -600,7 +615,7 @@
   border-top: 1px solid var(--rule-soft);
   padding: 20px 0 8px;
   width: 100%;
-  max-width: 960px;
+  max-width: var(--workspace-width);
 }
 /* ── Layout robustness & motion ── */
 .layout > *,
@@ -638,7 +653,8 @@
 
 @media (max-width: 1024px) {
   .appShell {
-    padding: 24px 16px 16px 84px;
+    --workspace-gutter: 16px;
+    padding-block: 24px 16px;
   }
 }
 

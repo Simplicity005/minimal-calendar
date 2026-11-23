@@ -1,15 +1,14 @@
 .sidebar {
-  --rail-width: 68px;
   --item-width: 44px;
   --drawer-duration: 210ms;
   position: fixed;
   inset: 0 auto 0 0;
-  width: 250px;
+  width: var(--sidebar-panel-width);
   z-index: 42;
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  clip-path: inset(0 calc(100% - var(--rail-width)) 0 0);
+  clip-path: inset(0 calc(100% - var(--sidebar-rail-width)) 0 0);
   transition: clip-path var(--drawer-duration) var(--ease-soft);
 }
 
@@ -25,11 +24,6 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 170ms ease;
-}
-
-.overlay[data-expanded="true"] {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .header,
@@ -192,13 +186,38 @@
   font-size: 11px;
 }
 
-@media (width > 768px) {
+@media (768px < width < 1280px) {
+  .overlay[data-expanded="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .sidebar[data-expanded="false"] :is(.navItem, .account) {
     width: var(--item-width);
   }
 
-  .sidebar[data-expanded="false"] :is(.brand, .sectionHeader) {
+  .sidebar[data-expanded="false"] :is(.brand, .sectionHeader, .label, .accountInfo) {
     visibility: hidden;
+  }
+}
+
+@media (min-width: 1280px) {
+  .sidebar,
+  .sidebar[data-expanded="true"] {
+    clip-path: none;
+    transition: none;
+    border-inline-end: 1px solid var(--rule);
+  }
+
+  .desktopToggle {
+    display: none;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    min-height: 42px;
+    margin-inline-start: 12px;
   }
 }
 
@@ -220,11 +239,6 @@
   }
 
   .sidebar[data-mobile-open="false"] {
-    pointer-events: none;
-  }
-
-  .overlay[data-expanded="true"] {
-    opacity: 0;
     pointer-events: none;
   }
 

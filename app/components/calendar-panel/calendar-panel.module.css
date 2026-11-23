@@ -173,7 +173,7 @@
 }
 
 .grid {
-  --row-h: 46px;
+  --row-h: clamp(46px, 8.5cqw, 76px);
   position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);

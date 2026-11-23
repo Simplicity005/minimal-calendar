@@ -84,7 +84,7 @@ export function Sidebar({
   const closeSidebar = () => {
     if (isMobileOpen) {
       setIsMobileOpen(false);
-    } else {
+    } else if (isExpanded) {
       toggleButton.current?.focus();
       setIsExpanded(false);
     }
@@ -148,6 +148,7 @@ export function Sidebar({
               key={room.id}
               type="button"
               className={styles.navItem}
+              aria-label={room.name}
               aria-current={activeRoom?.id === room.id ? "true" : undefined}
               onClick={() => {
                 onSelectRoom(room.id);
@@ -162,6 +163,7 @@ export function Sidebar({
           <button
             type="button"
             className={styles.navItem}
+            aria-label="Create or join space"
             onClick={() => {
               closeSidebar();
               onOpenManageRooms();
@@ -193,6 +195,7 @@ export function Sidebar({
           <button
             type="button"
             className={styles.navItem}
+            aria-label="Sign out"
             onClick={() => {
               closeSidebar();
               onSignOut();
