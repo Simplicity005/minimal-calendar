@@ -16,3 +16,7 @@ export type CalendarEvent = {
   description?: string;
   created_by?: string;
 };
+
+export type EventFields = Pick<CalendarEvent,
+  "calendar_id" | "title" | "event_date" | "event_time" | "event_type" | "description"
+>;

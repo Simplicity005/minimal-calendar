@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { format } from "date-fns";
-import { X, Calendar as CalendarIcon, Clock, AlignLeft, User } from "lucide-react";
+import { X, Calendar as CalendarIcon, Clock, AlignLeft, User, Pencil } from "lucide-react";
 import type { CalendarEvent, Room } from "../../types/calendar";
 import styles from "./event-details-dialog.module.css";
 import { usePresence } from "../../hooks/usePresence";
@@ -12,10 +12,11 @@ type Props = {
   rooms: Room[];
   isOpen: boolean;
   onClose: () => void;
+  onEdit: (event: CalendarEvent) => void;
   currentUserId: string | null;
 };
 
-export function EventDetailsDialog({ event: eventProp, rooms, isOpen, onClose, currentUserId }: Props) {
+export function EventDetailsDialog({ event: eventProp, rooms, isOpen, onClose, onEdit, currentUserId }: Props) {
   // Remember the last event so the content stays visible during the exit animation
   const lastEvent = useRef<CalendarEvent | null>(eventProp);
   if (eventProp) lastEvent.current = eventProp;
@@ -111,6 +112,11 @@ export function EventDetailsDialog({ event: eventProp, rooms, isOpen, onClose, c
             </div>
           </div>
         </div>
+        {eventRoom && (
+          <button type="button" className={styles.editBtn} onClick={() => onEdit(event)}>
+            <Pencil size={14} aria-hidden="true" /> Edit event
+          </button>
+        )}
       </div>
     </div>
   );

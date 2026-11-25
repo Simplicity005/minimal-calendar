@@ -141,6 +141,8 @@ $$;
 GRANT EXECUTE ON FUNCTION delete_user_account() TO authenticated;
 ```
 
+For both new and existing databases, run the [event editing migration](supabase/migrations/20261125000000_allow_event_edits.sql) once in the Supabase SQL Editor. It lets members edit events in their rooms and move events between rooms they belong to. Existing databases only need the migration.
+
 ### 4. Run the Development Server
 Start the local server:
 ```bash

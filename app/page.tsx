@@ -18,7 +18,7 @@ import { SignOutDialog } from "./components/sign-out-dialog/sign-out-dialog";
 import { Sidebar } from "./components/sidebar/sidebar";
 import styles from "./page.module.css";
 import { supabase } from "../lib/supabase";
-import type { CalendarEvent, EventType, Room } from "./types/calendar";
+import type { CalendarEvent, EventFields, Room } from "./types/calendar";
 import { useNotifications } from "./hooks/useNotifications";
 import { usePresence } from "./hooks/usePresence";
 import { useCalendarEvents } from "./hooks/useCalendarEvents";
@@ -48,6 +48,7 @@ export default function Home() {
   // Calendar state
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -171,20 +172,20 @@ export default function Home() {
     }
   };
 
-  const handleAddEvent = async (title: string, time: string, type: EventType, date: string, roomId: string, description: string) => {
-    if (!userId) return false;
-    const { error } = await supabase.from("events").insert([{
-      calendar_id: roomId,
-      title,
-      event_date: date,
-      event_time: `${time}:00`,
-      event_type: type,
-      description,
-      created_by: userId,
-    }]);
-    if (error) { console.error("Error adding event:", error); alert("Failed to add event"); return false; }
+  const openEventEditor = (event: CalendarEvent | null) => {
+    setEditingEvent(event);
+    setSelectedEvent(null);
+    setIsEventModalOpen(true);
+  };
+
+  const handleSaveEvent = async (fields: EventFields) => {
+    if (!userId) throw new Error("Sign in to save an event.");
+    const { error } = editingEvent
+      ? await supabase.from("events").update(fields).eq("id", editingEvent.id)
+          .eq("calendar_id", editingEvent.calendar_id).select("id").single()
+      : await supabase.from("events").insert({ ...fields, created_by: userId });
+    if (error) throw error;
     setRefreshTrigger(prev => prev + 1);
-    return true;
   };
 
   const handleDeleteEvent = async (id: string) => {
@@ -381,7 +382,7 @@ export default function Home() {
             <CalendarPanel
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
-              onAddEvent={() => setIsEventModalOpen(true)}
+              onAddEvent={() => openEventEditor(null)}
               activeRoom={activeRoom}
               rooms={rooms}
               refreshTrigger={refreshTrigger}
@@ -396,7 +397,7 @@ export default function Home() {
                 events={events}
                 isLoading={isAgendaLoading}
                 onDeleteEvent={handleDeleteEvent}
-                onAddEvent={() => setIsEventModalOpen(true)}
+                onAddEvent={() => openEventEditor(null)}
                 onEventClick={(ev) => setSelectedEvent(ev)}
                 activeRoomName={activeRoom?.name}
               />
@@ -422,18 +423,18 @@ export default function Home() {
                         const [y, m, d] = ev.event_date.split("-").map(Number);
                         const localDate = new Date(y, m - 1, d);
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={ev.id}
                             className={styles.upcomingItem}
                             onClick={() => setSelectedEvent(ev)}
-                            style={{ cursor: "pointer" }}
                           >
-                            <div className={styles.upcomingDate}>{format(localDate, "MMM d")}</div>
-                            <div className={styles.upcomingDetails}>
-                              <div className={styles.upcomingName}>{ev.title}</div>
-                              <div className={styles.upcomingTime}>{ev.event_time.slice(0, 5)}</div>
-                            </div>
-                          </div>
+                            <span className={styles.upcomingDate}>{format(localDate, "MMM d")}</span>
+                            <span className={styles.upcomingDetails}>
+                              <span className={styles.upcomingName}>{ev.title}</span>
+                              <span className={styles.upcomingTime}>{ev.event_time.slice(0, 5)}</span>
+                            </span>
+                          </button>
                         );
                       })}
                       {future.length > 3 && (
@@ -468,9 +469,11 @@ export default function Home() {
 
       {/* Dialogs */}
       <EventDialog
+        key={editingEvent?.id ?? "new-event"}
+        event={editingEvent}
         isOpen={isEventModalOpen}
         onClose={() => setIsEventModalOpen(false)}
-        onSave={handleAddEvent}
+        onSave={handleSaveEvent}
         rooms={rooms}
         defaultRoomId={activeRoom?.id || ""}
         defaultDate={selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd")}
@@ -517,13 +520,16 @@ export default function Home() {
         onOpenInvite={() => setIsInviteModalOpen(true)}
         onLeaveRoom={handleLeaveRoom}
       />
-      <EventDetailsDialog
-        isOpen={!!selectedEvent}
-        onClose={() => setSelectedEvent(null)}
-        event={selectedEvent}
-        rooms={rooms}
-        currentUserId={userId}
-      />
+      {!isEventModalOpen && (
+        <EventDetailsDialog
+          isOpen={!!selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          event={selectedEvent}
+          rooms={rooms}
+          currentUserId={userId}
+          onEdit={openEventEditor}
+        />
+      )}
     </div>
   );
 }

@@ -44,6 +44,23 @@
   color: var(--ink);
 }
 
+.editBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0 auto;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  border-color: var(--gold);
+}
+
 .header {
   margin-bottom: 1.8rem;
   padding-right: 2rem;

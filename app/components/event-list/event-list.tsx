@@ -69,19 +69,19 @@ export function EventList({
                 <div 
                   key={ev.id} 
                   className={`${styles.agendaRow} ${removingId === ev.id ? styles.removing : ""}`}
-                  onClick={() => onEventClick(ev)}
-                  style={{ cursor: "pointer" }}
                 >
                   <div className={styles.agendaTime}>{timeFormatted}</div>
                   <div className={styles.agendaBody}>
-                    <div className={styles.title}>{ev.title}</div>
+                    <button type="button" className={styles.title} onClick={() => onEventClick(ev)}>
+                      {ev.title}
+                    </button>
                     <div className={`${styles.meta} ${getMetaClass(ev.event_type)}`}>
                       {ev.event_type}
                     </div>
                   </div>
                   <button 
                     className={styles.deleteBtn} 
-                    onClick={(e) => { e.stopPropagation(); handleDelete(ev.id); }}
+                    onClick={() => handleDelete(ev.id)}
                     title="Delete event"
                     aria-label="Delete event"
                   >

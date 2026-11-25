@@ -271,6 +271,10 @@
 }
 
 .upcomingItem {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
   display: flex;
   align-items: baseline;
   gap: 12px;
